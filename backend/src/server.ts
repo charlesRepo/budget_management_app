@@ -5,6 +5,7 @@ import session from 'express-session';
 import path from 'path';
 import passport from './config/passport';
 import authRoutes from './routes/auth';
+import expenseRoutes from './routes/expenses';
 
 // Load environment variables
 dotenv.config();
@@ -42,8 +43,10 @@ app.get('/api/health', (req: Request, res: Response) => {
 // Authentication routes
 app.use('/api/auth', authRoutes);
 
+// Expense routes
+app.use('/api/expenses', expenseRoutes);
+
 // Other API routes will be added here
-// app.use('/api/expenses', expenseRoutes);
 // app.use('/api/income', incomeRoutes);
 // app.use('/api/settings', settingsRoutes);
 

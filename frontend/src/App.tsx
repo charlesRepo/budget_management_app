@@ -6,6 +6,8 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
+import Expenses from './pages/Expenses';
+import ExpenseForm from './pages/ExpenseForm';
 
 function App() {
   return (
@@ -23,6 +25,36 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Expenses />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ExpenseForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/expenses/:id/edit"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ExpenseForm />
                 </Layout>
               </ProtectedRoute>
             }
