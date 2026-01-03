@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - stores authenticated users
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  googleId  String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses  Expense[]
+  income    Income[]
+  settings  Settings?
+}
+
+// Expense model - stores all budget expenses
+model Expense {
+  id           String   @id @default(cuid())
+  userId       String
+  name         String
+  category     String
+  amount       Float
+  accountType  String   // 'checking' or 'credit_card'
+  paymentType  String   // 'automatic' or 'manual'
+  frequency    String   // 'monthly', 'quarterly', 'yearly', 'custom'
+  activeMonths Int[]    // Array of months [1-12] when expense is active
+  notes        String?
+  isArchived   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([accountType])
+  @@index([category])
+}
+
+// Income model - tracks monthly income for both partners
+model Income {
+  id         String   @id @default(cuid())
+  userId     String
+  personName String   // 'Person 1' or 'Person 2' or custom names
+  amount     Float
+  month      String   // Format: YYYY-MM
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, personName, month])
+  @@index([userId])
+  @@index([month])
+}
+
+// Settings model - stores user preferences and configuration
+model Settings {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  splitRatioPerson1  Int      @default(50) // Percentage for person 1 (0-100)
+  splitRatioPerson2  Int      @default(50) // Percentage for person 2 (0-100)
+  person1Name        String   @default("Person 1")
+  person2Name        String   @default("Person 2")
+  authorizedEmails   String[] // List of authorized email addresses
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
