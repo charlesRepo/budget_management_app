@@ -49,17 +49,18 @@ model Expense {
 
 // Income model - tracks monthly income for both partners
 model Income {
-  id         String   @id @default(cuid())
-  userId     String
-  personName String   // 'Person 1' or 'Person 2' or custom names
-  amount     Float
-  month      String   // Format: YYYY-MM
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String   @id @default(cuid())
+  userId        String
+  personName    String   // Selected from Settings (person1Name or person2Name)
+  amount        Float
+  month         String   // Format: YYYY-MM
+  paymentPeriod String   // 'part1' or 'part2' for bi-weekly/semi-monthly tracking
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, personName, month])
+  @@unique([userId, personName, month, paymentPeriod])
   @@index([userId])
   @@index([month])
 }

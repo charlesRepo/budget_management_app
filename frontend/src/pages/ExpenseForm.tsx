@@ -56,7 +56,14 @@ const ExpenseForm: React.FC = () => {
   };
 
   const handleChange = (field: keyof CreateExpenseInput, value: any) => {
-    setFormData({ ...formData, [field]: value });
+    const newData = { ...formData, [field]: value };
+
+    // If changing frequency to monthly, automatically select all 12 months
+    if (field === 'frequency' && value === 'monthly') {
+      newData.activeMonths = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    }
+
+    setFormData(newData);
     // Clear error for this field
     if (errors[field]) {
       setErrors({ ...errors, [field]: '' });
@@ -96,7 +103,8 @@ const ExpenseForm: React.FC = () => {
       newErrors.amount = 'Amount must be greater than 0';
     }
 
-    if (formData.activeMonths.length === 0) {
+    // Only validate active months for non-monthly frequencies
+    if (formData.frequency !== 'monthly' && formData.activeMonths.length === 0) {
       newErrors.activeMonths = 'At least one month must be selected';
     }
 
@@ -229,32 +237,34 @@ const ExpenseForm: React.FC = () => {
           </select>
         </div>
 
-        {/* Active Months */}
-        <div style={styles.formGroup}>
-          <label style={styles.label}>Active Months *</label>
-          <p style={styles.helper}>Select the months when this expense occurs</p>
-          <div style={styles.monthsGrid}>
-            {MONTHS.map((month, index) => {
-              const monthNumber = index + 1;
-              const isSelected = formData.activeMonths.includes(monthNumber);
+        {/* Active Months - Only show for non-monthly frequencies */}
+        {formData.frequency !== 'monthly' && (
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Active Months *</label>
+            <p style={styles.helper}>Select the months when this expense occurs</p>
+            <div style={styles.monthsGrid}>
+              {MONTHS.map((month, index) => {
+                const monthNumber = index + 1;
+                const isSelected = formData.activeMonths.includes(monthNumber);
 
-              return (
-                <button
-                  key={monthNumber}
-                  type="button"
-                  onClick={() => handleMonthToggle(monthNumber)}
-                  style={{
-                    ...styles.monthButton,
-                    ...(isSelected ? styles.monthButtonSelected : {}),
-                  }}
-                >
-                  {month.slice(0, 3)}
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={monthNumber}
+                    type="button"
+                    onClick={() => handleMonthToggle(monthNumber)}
+                    style={{
+                      ...styles.monthButton,
+                      ...(isSelected ? styles.monthButtonSelected : {}),
+                    }}
+                  >
+                    {month.slice(0, 3)}
+                  </button>
+                );
+              })}
+            </div>
+            {errors.activeMonths && <span style={styles.errorText}>{errors.activeMonths}</span>}
           </div>
-          {errors.activeMonths && <span style={styles.errorText}>{errors.activeMonths}</span>}
-        </div>
+        )}
 
         {/* Notes */}
         <div style={styles.formGroup}>

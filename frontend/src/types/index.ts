@@ -54,3 +54,54 @@ export interface ExpenseFilters {
   isArchived?: boolean;
   search?: string;
 }
+
+// Income types
+export type PaymentPeriod = 'part1' | 'part2';
+
+export interface Income {
+  id: string;
+  userId: string;
+  personName: string;
+  amount: number;
+  month: string; // Format: YYYY-MM
+  paymentPeriod: PaymentPeriod;
+  createdAt: string;
+  updatedAt: string;
+  isInherited?: boolean; // True if inherited from previous month
+  originalMonth?: string; // The month it was originally created in
+}
+
+export interface CreateIncomeInput {
+  personName: string;
+  amount: number;
+  month: string; // Format: YYYY-MM
+  paymentPeriod: PaymentPeriod;
+}
+
+export interface UpdateIncomeInput {
+  personName?: string;
+  amount?: number;
+  month?: string;
+  paymentPeriod?: PaymentPeriod;
+}
+
+// Settings types
+export interface Settings {
+  id: string;
+  userId: string;
+  splitRatioPerson1: number;
+  splitRatioPerson2: number;
+  person1Name: string;
+  person2Name: string;
+  authorizedEmails: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateSettingsInput {
+  splitRatioPerson1?: number;
+  splitRatioPerson2?: number;
+  person1Name?: string;
+  person2Name?: string;
+  authorizedEmails?: string[];
+}

@@ -6,6 +6,8 @@ import path from 'path';
 import passport from './config/passport';
 import authRoutes from './routes/auth';
 import expenseRoutes from './routes/expenses';
+import incomeRoutes from './routes/income';
+import settingsRoutes from './routes/settings';
 
 // Load environment variables
 dotenv.config();
@@ -46,9 +48,11 @@ app.use('/api/auth', authRoutes);
 // Expense routes
 app.use('/api/expenses', expenseRoutes);
 
-// Other API routes will be added here
-// app.use('/api/income', incomeRoutes);
-// app.use('/api/settings', settingsRoutes);
+// Income routes
+app.use('/api/income', incomeRoutes);
+
+// Settings routes
+app.use('/api/settings', settingsRoutes);
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {

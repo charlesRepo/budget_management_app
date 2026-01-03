@@ -48,7 +48,7 @@ A web-based budget management application for a household with two income earner
   - Account type (Checking or Credit Card)
   - Payment type (Automatic or Manual)
   - Payment frequency (Monthly, Quarterly, Yearly, or Custom)
-  - Active months (for expenses that don't occur every month)
+  - Active months (shown only for Quarterly, Yearly, or Custom frequencies; Monthly automatically applies to all 12 months)
   - Notes/comments field
 
 #### 3.1.2 Expense Editing
@@ -90,9 +90,12 @@ A web-based budget management application for a household with two income earner
 ### 3.4 Income & Contribution Calculation
 
 #### 3.4.1 Income Tracking
-- Enter both partners' monthly salaries
-- Track income from current and previous month
-- Historical income records
+- Enter both partners' salaries with payment period tracking (Part 1/Part 2)
+  - Supports bi-weekly (2 paychecks per month) and semi-monthly (2 paychecks on fixed dates)
+  - Each income entry specifies which payment period it belongs to (Part 1 or Part 2)
+- Person names are selected from Settings configuration (not manually typed)
+- Track income from current and previous months
+- Historical income records by month and payment period
 
 #### 3.4.2 Split Ratio Configuration
 - Configurable split ratio (currently 60/40 based on salary difference)
@@ -172,9 +175,10 @@ Display:
 ```
 {
   id: string
-  personName: string
+  personName: string // Selected from Settings (person1Name or person2Name)
   amount: number
   month: string // YYYY-MM
+  paymentPeriod: 'part1' | 'part2' // For tracking bi-weekly/semi-monthly payments
   createdAt: timestamp
 }
 ```

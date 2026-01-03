@@ -45,6 +45,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 Expenses
               </button>
+              <button
+                onClick={() => navigate('/income')}
+                style={{
+                  ...styles.navLink,
+                  ...(isActive('/income') ? styles.navLinkActive : {}),
+                }}
+              >
+                Income
+              </button>
+              <button
+                onClick={() => navigate('/settings')}
+                style={{
+                  ...styles.navLink,
+                  ...(isActive('/settings') ? styles.navLinkActive : {}),
+                }}
+              >
+                Settings
+              </button>
             </nav>
           </div>
           <div style={styles.userSection}>

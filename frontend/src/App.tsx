@@ -8,6 +8,8 @@ import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import ExpenseForm from './pages/ExpenseForm';
+import Income from './pages/Income';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -55,6 +57,26 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <ExpenseForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/income"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Income />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Settings />
                 </Layout>
               </ProtectedRoute>
             }
