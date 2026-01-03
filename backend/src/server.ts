@@ -1,7 +1,10 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
+import session from 'express-session';
 import path from 'path';
+import passport from './config/passport';
+import authRoutes from './routes/auth';
 
 // Load environment variables
 dotenv.config();
@@ -14,13 +17,35 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Session configuration (needed for passport)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'your-session-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production', // Only use secure cookies in production
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    },
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// API routes will be added here
-// app.use('/api', apiRoutes);
+// Authentication routes
+app.use('/api/auth', authRoutes);
+
+// Other API routes will be added here
+// app.use('/api/expenses', expenseRoutes);
+// app.use('/api/income', incomeRoutes);
+// app.use('/api/settings', settingsRoutes);
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
