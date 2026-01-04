@@ -21,12 +21,16 @@ const Settings: React.FC = () => {
       setFormData({
         splitRatioPerson1: data.splitRatioPerson1,
         splitRatioPerson2: data.splitRatioPerson2,
+        autoCalculateSplitRatio: data.autoCalculateSplitRatio,
         person1Name: data.person1Name,
         person2Name: data.person2Name,
         checkingBalance: data.checkingBalance,
         creditCardBalance: data.creditCardBalance,
         lineOfCreditBalance: data.lineOfCreditBalance,
         studentLineOfCreditBalance: data.studentLineOfCreditBalance,
+        travelSavings: data.travelSavings,
+        homeSavings: data.homeSavings,
+        generalSavings: data.generalSavings,
       });
     } catch (error) {
       console.error('Failed to fetch settings:', error);
@@ -39,13 +43,15 @@ const Settings: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate split ratios
-    const ratio1 = formData.splitRatioPerson1 || 0;
-    const ratio2 = formData.splitRatioPerson2 || 0;
+    // Validate split ratios only if not auto-calculating
+    if (!formData.autoCalculateSplitRatio) {
+      const ratio1 = formData.splitRatioPerson1 || 0;
+      const ratio2 = formData.splitRatioPerson2 || 0;
 
-    if (ratio1 + ratio2 !== 100) {
-      alert('Split ratios must sum to 100%');
-      return;
+      if (ratio1 + ratio2 !== 100) {
+        alert('Split ratios must sum to 100%');
+        return;
+      }
     }
 
     try {
@@ -99,6 +105,21 @@ const Settings: React.FC = () => {
           <h2 style={styles.sectionTitle}>Split Ratio</h2>
           <p style={styles.helper}>Configure how expenses are split between partners (must total 100%)</p>
 
+          <div style={styles.formGroup}>
+            <label style={{ ...styles.label, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={formData.autoCalculateSplitRatio || false}
+                onChange={(e) => setFormData({ ...formData, autoCalculateSplitRatio: e.target.checked })}
+                style={{ width: 'auto', cursor: 'pointer' }}
+              />
+              Auto-calculate split ratio based on income
+            </label>
+            <span style={styles.helperSmall}>
+              When enabled, split ratio is automatically calculated from each person's monthly income
+            </span>
+          </div>
+
           <div style={styles.ratioContainer}>
             <div style={styles.formGroup}>
               <label style={styles.label}>{formData.person1Name || 'Person 1'} (%)</label>
@@ -111,7 +132,8 @@ const Settings: React.FC = () => {
                   setFormData({ ...formData, splitRatioPerson1: parseInt(e.target.value) || 0 })
                 }
                 style={styles.input}
-                required
+                disabled={formData.autoCalculateSplitRatio}
+                required={!formData.autoCalculateSplitRatio}
               />
             </div>
 
@@ -126,7 +148,8 @@ const Settings: React.FC = () => {
                   setFormData({ ...formData, splitRatioPerson2: parseInt(e.target.value) || 0 })
                 }
                 style={styles.input}
-                required
+                disabled={formData.autoCalculateSplitRatio}
+                required={!formData.autoCalculateSplitRatio}
               />
             </div>
           </div>
@@ -194,6 +217,59 @@ const Settings: React.FC = () => {
               />
               <span style={styles.helperSmall}>Use negative value for debt</span>
             </div>
+          </div>
+        </div>
+
+        <div style={styles.card}>
+          <h2 style={styles.sectionTitle}>Monthly Savings Goals</h2>
+          <p style={styles.helper}>Set monthly savings targets (split between partners based on ratio)</p>
+
+          <div style={styles.balancesGrid}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Travel Savings ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.travelSavings || ''}
+                onChange={(e) => setFormData({ ...formData, travelSavings: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="1000.00"
+              />
+              <span style={styles.helperSmall}>Monthly savings for travel</span>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Home Savings ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.homeSavings || ''}
+                onChange={(e) => setFormData({ ...formData, homeSavings: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="500.00"
+              />
+              <span style={styles.helperSmall}>Monthly savings for home expenses</span>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>General Savings ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.generalSavings || ''}
+                onChange={(e) => setFormData({ ...formData, generalSavings: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="1000.00"
+              />
+              <span style={styles.helperSmall}>Monthly general savings</span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '16px', fontSize: '14px', fontWeight: '500' }}>
+            Total Monthly Savings: ${((formData.travelSavings || 0) + (formData.homeSavings || 0) + (formData.generalSavings || 0)).toFixed(2)}
           </div>
         </div>
 

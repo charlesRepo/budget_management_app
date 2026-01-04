@@ -91,6 +91,7 @@ export interface Settings {
   userId: string;
   splitRatioPerson1: number;
   splitRatioPerson2: number;
+  autoCalculateSplitRatio: boolean;
   person1Name: string;
   person2Name: string;
   authorizedEmails: string[];
@@ -98,6 +99,9 @@ export interface Settings {
   creditCardBalance: number;
   lineOfCreditBalance: number;
   studentLineOfCreditBalance: number;
+  travelSavings: number;
+  homeSavings: number;
+  generalSavings: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -105,6 +109,7 @@ export interface Settings {
 export interface UpdateSettingsInput {
   splitRatioPerson1?: number;
   splitRatioPerson2?: number;
+  autoCalculateSplitRatio?: boolean;
   person1Name?: string;
   person2Name?: string;
   authorizedEmails?: string[];
@@ -112,6 +117,9 @@ export interface UpdateSettingsInput {
   creditCardBalance?: number;
   lineOfCreditBalance?: number;
   studentLineOfCreditBalance?: number;
+  travelSavings?: number;
+  homeSavings?: number;
+  generalSavings?: number;
 }
 
 // Calculation types
@@ -131,12 +139,27 @@ export interface AccountCalculation {
   balanceAfterExpenses: number;
 }
 
+export interface SavingsCalculation {
+  travel: PersonContribution;
+  home: PersonContribution;
+  general: PersonContribution;
+  total: PersonContribution;
+}
+
 export interface MonthlyCalculation {
   month: string;
   checking: AccountCalculation;
   creditCard: AccountCalculation;
   lineOfCredit: AccountCalculation;
   studentLineOfCredit: AccountCalculation;
+  savings: {
+    person1: SavingsCalculation;
+    person2: SavingsCalculation;
+    travelGoal: number;
+    homeGoal: number;
+    generalGoal: number;
+    totalGoal: number;
+  };
   totalIncome: number;
   totalExpenses: number;
   balance: number;
@@ -162,4 +185,30 @@ export interface MonthlyCalculation {
     remainingAfterPart1: number;
     remainingAfterPart2: number;
   };
+}
+
+// Account Credit types
+export interface AccountCredit {
+  id: string;
+  userId: string;
+  description: string;
+  amount: number;
+  accountType: AccountType;
+  month: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAccountCreditInput {
+  description: string;
+  amount: number;
+  accountType: AccountType;
+  month: string;
+}
+
+export interface UpdateAccountCreditInput {
+  description?: string;
+  amount?: number;
+  accountType?: AccountType;
+  month?: string;
 }

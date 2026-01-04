@@ -1,5 +1,6 @@
 import prisma from '../config/prisma';
 import type { Expense, Income, Settings } from '@prisma/client';
+import { accountCreditService } from './accountCredit.service';
 
 interface PersonContribution {
   part1: number;
@@ -29,12 +30,27 @@ interface PersonCalculation {
   remainingAfterPart2: number;
 }
 
+interface SavingsCalculation {
+  travel: PersonContribution;
+  home: PersonContribution;
+  general: PersonContribution;
+  total: PersonContribution;
+}
+
 interface MonthlyCalculation {
   month: string;
   checking: AccountCalculation;
   creditCard: AccountCalculation;
   lineOfCredit: AccountCalculation;
   studentLineOfCredit: AccountCalculation;
+  savings: {
+    person1: SavingsCalculation;
+    person2: SavingsCalculation;
+    travelGoal: number;
+    homeGoal: number;
+    generalGoal: number;
+    totalGoal: number;
+  };
   totalIncome: number;
   totalExpenses: number;
   balance: number;
@@ -173,12 +189,16 @@ export const calculationService = {
       }),
     ]);
 
+    // Fetch account credits for this month
+    const credits = await accountCreditService.getTotalCreditsByAccount(userId, monthStr);
+
     // Use default settings if none exist
-    const effectiveSettings = settings || {
+    let effectiveSettings = settings || {
       id: '',
       userId,
       splitRatioPerson1: 50,
       splitRatioPerson2: 50,
+      autoCalculateSplitRatio: false,
       person1Name: 'Person 1',
       person2Name: 'Person 2',
       authorizedEmails: [],
@@ -186,6 +206,9 @@ export const calculationService = {
       creditCardBalance: 0,
       lineOfCreditBalance: 0,
       studentLineOfCreditBalance: 0,
+      travelSavings: 1000,
+      homeSavings: 500,
+      generalSavings: 1000,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -210,6 +233,20 @@ export const calculationService = {
           person2IncomePart2 += income.amount;
         }
       }
+    }
+
+    // Auto-calculate split ratio if enabled
+    const person1TotalIncome = person1IncomePart1 + person1IncomePart2;
+    const person2TotalIncome = person2IncomePart1 + person2IncomePart2;
+    const combinedIncome = person1TotalIncome + person2TotalIncome;
+
+    if (effectiveSettings.autoCalculateSplitRatio && combinedIncome > 0) {
+      // Calculate split ratio based on income proportions
+      effectiveSettings = {
+        ...effectiveSettings,
+        splitRatioPerson1: Math.round((person1TotalIncome / combinedIncome) * 100),
+        splitRatioPerson2: Math.round((person2TotalIncome / combinedIncome) * 100),
+      };
     }
 
     // Calculate account totals for all 4 accounts
@@ -255,58 +292,110 @@ export const calculationService = {
       person2IncomePart2
     );
 
+    // Calculate savings contributions
+    const travelSavingsContributions = this.calculateAccountContributions(
+      effectiveSettings.travelSavings,
+      effectiveSettings,
+      person1IncomePart1,
+      person1IncomePart2,
+      person2IncomePart1,
+      person2IncomePart2
+    );
+
+    const homeSavingsContributions = this.calculateAccountContributions(
+      effectiveSettings.homeSavings,
+      effectiveSettings,
+      person1IncomePart1,
+      person1IncomePart2,
+      person2IncomePart1,
+      person2IncomePart2
+    );
+
+    const generalSavingsContributions = this.calculateAccountContributions(
+      effectiveSettings.generalSavings,
+      effectiveSettings,
+      person1IncomePart1,
+      person1IncomePart2,
+      person2IncomePart1,
+      person2IncomePart2
+    );
+
+    // Calculate total savings per person
+    const person1TravelSavings = travelSavingsContributions.person1;
+    const person1HomeSavings = homeSavingsContributions.person1;
+    const person1GeneralSavings = generalSavingsContributions.person1;
+    const person1TotalSavings = {
+      part1: person1TravelSavings.part1 + person1HomeSavings.part1 + person1GeneralSavings.part1,
+      part2: person1TravelSavings.part2 + person1HomeSavings.part2 + person1GeneralSavings.part2,
+      total: person1TravelSavings.total + person1HomeSavings.total + person1GeneralSavings.total,
+    };
+
+    const person2TravelSavings = travelSavingsContributions.person2;
+    const person2HomeSavings = homeSavingsContributions.person2;
+    const person2GeneralSavings = generalSavingsContributions.person2;
+    const person2TotalSavings = {
+      part1: person2TravelSavings.part1 + person2HomeSavings.part1 + person2GeneralSavings.part1,
+      part2: person2TravelSavings.part2 + person2HomeSavings.part2 + person2GeneralSavings.part2,
+      total: person2TravelSavings.total + person2HomeSavings.total + person2GeneralSavings.total,
+    };
+
+    const totalSavingsGoal = effectiveSettings.travelSavings + effectiveSettings.homeSavings + effectiveSettings.generalSavings;
+
     // Calculate total income
     const totalIncome = person1IncomePart1 + person1IncomePart2 + person2IncomePart1 + person2IncomePart2;
 
-    // Calculate total expenses
+    // Calculate total expenses (including savings)
     const totalExpenses =
       checkingTotals.total +
       creditCardTotals.total +
       lineOfCreditTotals.total +
-      studentLineOfCreditTotals.total;
+      studentLineOfCreditTotals.total +
+      totalSavingsGoal;
 
     // Calculate balance
     const balance = totalIncome - totalExpenses;
-
-    // Calculate person totals
-    const person1TotalIncome = person1IncomePart1 + person1IncomePart2;
-    const person2TotalIncome = person2IncomePart1 + person2IncomePart2;
 
     const person1TotalContribution =
       checkingContributions.person1.total +
       creditCardContributions.person1.total +
       lineOfCreditContributions.person1.total +
-      studentLineOfCreditContributions.person1.total;
+      studentLineOfCreditContributions.person1.total +
+      person1TotalSavings.total;
 
     const person2TotalContribution =
       checkingContributions.person2.total +
       creditCardContributions.person2.total +
       lineOfCreditContributions.person2.total +
-      studentLineOfCreditContributions.person2.total;
+      studentLineOfCreditContributions.person2.total +
+      person2TotalSavings.total;
 
     const person1ContributionPart1 =
       checkingContributions.person1.part1 +
       creditCardContributions.person1.part1 +
       lineOfCreditContributions.person1.part1 +
-      studentLineOfCreditContributions.person1.part1;
+      studentLineOfCreditContributions.person1.part1 +
+      person1TotalSavings.part1;
 
     const person1ContributionPart2 =
       checkingContributions.person1.part2 +
       creditCardContributions.person1.part2 +
       lineOfCreditContributions.person1.part2 +
-      studentLineOfCreditContributions.person1.part2;
+      studentLineOfCreditContributions.person1.part2 +
+      person1TotalSavings.part2;
 
     const person2ContributionPart1 =
       checkingContributions.person2.part1 +
       creditCardContributions.person2.part1 +
       lineOfCreditContributions.person2.part1 +
-      studentLineOfCreditContributions.person2.part1;
+      studentLineOfCreditContributions.person2.part1 +
+      person2TotalSavings.part1;
 
     const person2ContributionPart2 =
       checkingContributions.person2.part2 +
       creditCardContributions.person2.part2 +
       lineOfCreditContributions.person2.part2 +
-      studentLineOfCreditContributions.person2.part2;
+      studentLineOfCreditContributions.person2.part2 +
+      person2TotalSavings.part2;
 
     // Calculate remaining amounts
     const person1Remaining = person1TotalIncome - person1TotalContribution;
@@ -326,7 +415,7 @@ export const calculationService = {
         automaticPayments: checkingTotals.automatic,
         manualPayments: checkingTotals.manual,
         currentBalance: effectiveSettings.checkingBalance,
-        balanceAfterExpenses: effectiveSettings.checkingBalance - checkingTotals.total,
+        balanceAfterExpenses: effectiveSettings.checkingBalance - checkingTotals.total + credits.checking,
       },
       creditCard: {
         totalExpenses: creditCardTotals.total,
@@ -335,7 +424,7 @@ export const calculationService = {
         automaticPayments: creditCardTotals.automatic,
         manualPayments: creditCardTotals.manual,
         currentBalance: effectiveSettings.creditCardBalance,
-        balanceAfterExpenses: effectiveSettings.creditCardBalance - creditCardTotals.total,
+        balanceAfterExpenses: effectiveSettings.creditCardBalance - creditCardTotals.total + credits.creditCard,
       },
       lineOfCredit: {
         totalExpenses: lineOfCreditTotals.total,
@@ -344,7 +433,7 @@ export const calculationService = {
         automaticPayments: lineOfCreditTotals.automatic,
         manualPayments: lineOfCreditTotals.manual,
         currentBalance: effectiveSettings.lineOfCreditBalance,
-        balanceAfterExpenses: effectiveSettings.lineOfCreditBalance - lineOfCreditTotals.total,
+        balanceAfterExpenses: effectiveSettings.lineOfCreditBalance - lineOfCreditTotals.total + credits.lineOfCredit,
       },
       studentLineOfCredit: {
         totalExpenses: studentLineOfCreditTotals.total,
@@ -353,7 +442,25 @@ export const calculationService = {
         automaticPayments: studentLineOfCreditTotals.automatic,
         manualPayments: studentLineOfCreditTotals.manual,
         currentBalance: effectiveSettings.studentLineOfCreditBalance,
-        balanceAfterExpenses: effectiveSettings.studentLineOfCreditBalance - studentLineOfCreditTotals.total,
+        balanceAfterExpenses: effectiveSettings.studentLineOfCreditBalance - studentLineOfCreditTotals.total + credits.studentLineOfCredit,
+      },
+      savings: {
+        person1: {
+          travel: person1TravelSavings,
+          home: person1HomeSavings,
+          general: person1GeneralSavings,
+          total: person1TotalSavings,
+        },
+        person2: {
+          travel: person2TravelSavings,
+          home: person2HomeSavings,
+          general: person2GeneralSavings,
+          total: person2TotalSavings,
+        },
+        travelGoal: effectiveSettings.travelSavings,
+        homeGoal: effectiveSettings.homeSavings,
+        generalGoal: effectiveSettings.generalSavings,
+        totalGoal: totalSavingsGoal,
       },
       totalIncome,
       totalExpenses,

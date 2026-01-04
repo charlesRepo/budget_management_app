@@ -6,6 +6,7 @@ import { z } from 'zod';
 const updateSettingsSchema = z.object({
   splitRatioPerson1: z.number().min(0).max(100).optional(),
   splitRatioPerson2: z.number().min(0).max(100).optional(),
+  autoCalculateSplitRatio: z.boolean().optional(),
   person1Name: z.string().min(1).optional(),
   person2Name: z.string().min(1).optional(),
   authorizedEmails: z.array(z.string().email()).optional(),
@@ -13,6 +14,9 @@ const updateSettingsSchema = z.object({
   creditCardBalance: z.number().optional(),
   lineOfCreditBalance: z.number().optional(),
   studentLineOfCreditBalance: z.number().optional(),
+  travelSavings: z.number().min(0).optional(),
+  homeSavings: z.number().min(0).optional(),
+  generalSavings: z.number().min(0).optional(),
 }).refine(
   (data) => {
     // If both ratios are provided, they must sum to 100

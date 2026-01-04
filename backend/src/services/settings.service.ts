@@ -3,6 +3,7 @@ import prisma from '../config/prisma';
 export interface UpdateSettingsInput {
   splitRatioPerson1?: number;
   splitRatioPerson2?: number;
+  autoCalculateSplitRatio?: boolean;
   person1Name?: string;
   person2Name?: string;
   authorizedEmails?: string[];
@@ -10,6 +11,9 @@ export interface UpdateSettingsInput {
   creditCardBalance?: number;
   lineOfCreditBalance?: number;
   studentLineOfCreditBalance?: number;
+  travelSavings?: number;
+  homeSavings?: number;
+  generalSavings?: number;
 }
 
 export const settingsService = {

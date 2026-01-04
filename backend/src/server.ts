@@ -9,6 +9,7 @@ import expenseRoutes from './routes/expenses';
 import incomeRoutes from './routes/income';
 import settingsRoutes from './routes/settings';
 import calculationRoutes from './routes/calculations';
+import accountCreditRoutes from './routes/accountCredits';
 
 // Load environment variables
 dotenv.config();
@@ -57,6 +58,9 @@ app.use('/api/settings', settingsRoutes);
 
 // Calculation routes
 app.use('/api/calculations', calculationRoutes);
+
+// Account credit routes
+app.use('/api/account-credits', accountCreditRoutes);
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
