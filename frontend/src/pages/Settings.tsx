@@ -7,6 +7,7 @@ const Settings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<UpdateSettingsInput>({});
+  const [showBalances, setShowBalances] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -22,6 +23,10 @@ const Settings: React.FC = () => {
         splitRatioPerson2: data.splitRatioPerson2,
         person1Name: data.person1Name,
         person2Name: data.person2Name,
+        checkingBalance: data.checkingBalance,
+        creditCardBalance: data.creditCardBalance,
+        lineOfCreditBalance: data.lineOfCreditBalance,
+        studentLineOfCreditBalance: data.studentLineOfCreditBalance,
       });
     } catch (error) {
       console.error('Failed to fetch settings:', error);
@@ -134,6 +139,64 @@ const Settings: React.FC = () => {
           </div>
         </div>
 
+        <div style={styles.card}>
+          <h2 style={styles.sectionTitle}>Account Balances</h2>
+          <p style={styles.helper}>Enter current balances for accurate calculations (negative for debt)</p>
+
+          <div style={styles.balancesGrid}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Checking Balance ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.checkingBalance || ''}
+                onChange={(e) => setFormData({ ...formData, checkingBalance: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="0.00"
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Credit Card Balance ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.creditCardBalance || ''}
+                onChange={(e) => setFormData({ ...formData, creditCardBalance: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="0.00"
+              />
+              <span style={styles.helperSmall}>Use negative value if you owe money</span>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Line of Credit Balance ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.lineOfCreditBalance || ''}
+                onChange={(e) => setFormData({ ...formData, lineOfCreditBalance: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="0.00"
+              />
+              <span style={styles.helperSmall}>Use negative value for debt</span>
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Student Line of Credit Balance ($)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.studentLineOfCreditBalance || ''}
+                onChange={(e) => setFormData({ ...formData, studentLineOfCreditBalance: parseFloat(e.target.value) || 0 })}
+                style={styles.input}
+                placeholder="0.00"
+              />
+              <span style={styles.helperSmall}>Use negative value for debt</span>
+            </div>
+          </div>
+        </div>
+
         <div style={styles.actions}>
           <button type="submit" style={styles.saveButton} disabled={saving}>
             {saving ? 'Saving...' : 'Save Settings'}
@@ -167,6 +230,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     boxSizing: 'border-box',
   },
   ratioContainer: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
+  balancesGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' },
+  helperSmall: { display: 'block', fontSize: '12px', color: '#999', marginTop: '4px' },
   totalRatio: { marginTop: '16px', fontSize: '16px', fontWeight: '500' },
   errorText: { color: '#e74c3c' },
   actions: { display: 'flex', justifyContent: 'flex-end' },

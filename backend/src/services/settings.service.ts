@@ -6,6 +6,10 @@ export interface UpdateSettingsInput {
   person1Name?: string;
   person2Name?: string;
   authorizedEmails?: string[];
+  checkingBalance?: number;
+  creditCardBalance?: number;
+  lineOfCreditBalance?: number;
+  studentLineOfCreditBalance?: number;
 }
 
 export const settingsService = {

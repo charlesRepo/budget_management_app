@@ -4,7 +4,7 @@ export interface User {
   name: string | null;
 }
 
-export type AccountType = 'checking' | 'credit_card';
+export type AccountType = 'checking' | 'credit_card' | 'line_of_credit' | 'student_line_of_credit';
 export type PaymentType = 'automatic' | 'manual';
 export type Frequency = 'monthly' | 'quarterly' | 'yearly' | 'custom';
 
@@ -94,6 +94,10 @@ export interface Settings {
   person1Name: string;
   person2Name: string;
   authorizedEmails: string[];
+  checkingBalance: number;
+  creditCardBalance: number;
+  lineOfCreditBalance: number;
+  studentLineOfCreditBalance: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -104,4 +108,58 @@ export interface UpdateSettingsInput {
   person1Name?: string;
   person2Name?: string;
   authorizedEmails?: string[];
+  checkingBalance?: number;
+  creditCardBalance?: number;
+  lineOfCreditBalance?: number;
+  studentLineOfCreditBalance?: number;
+}
+
+// Calculation types
+export interface PersonContribution {
+  part1: number;
+  part2: number;
+  total: number;
+}
+
+export interface AccountCalculation {
+  totalExpenses: number;
+  person1Share: PersonContribution;
+  person2Share: PersonContribution;
+  automaticPayments: number;
+  manualPayments: number;
+  currentBalance: number;
+  balanceAfterExpenses: number;
+}
+
+export interface MonthlyCalculation {
+  month: string;
+  checking: AccountCalculation;
+  creditCard: AccountCalculation;
+  lineOfCredit: AccountCalculation;
+  studentLineOfCredit: AccountCalculation;
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
+  person1: {
+    totalIncome: number;
+    incomePart1: number;
+    incomePart2: number;
+    totalContribution: number;
+    contributionPart1: number;
+    contributionPart2: number;
+    remaining: number;
+    remainingAfterPart1: number;
+    remainingAfterPart2: number;
+  };
+  person2: {
+    totalIncome: number;
+    incomePart1: number;
+    incomePart2: number;
+    totalContribution: number;
+    contributionPart1: number;
+    contributionPart2: number;
+    remaining: number;
+    remainingAfterPart1: number;
+    remainingAfterPart2: number;
+  };
 }

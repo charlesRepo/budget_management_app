@@ -31,7 +31,7 @@ model Expense {
   name         String
   category     String
   amount       Float
-  accountType  String   // 'checking' or 'credit_card'
+  accountType  String   // 'checking', 'credit_card', 'line_of_credit', 'student_line_of_credit'
   paymentType  String   // 'automatic' or 'manual'
   frequency    String   // 'monthly', 'quarterly', 'yearly', 'custom'
   activeMonths Int[]    // Array of months [1-12] when expense is active
@@ -67,15 +67,19 @@ model Income {
 
 // Settings model - stores user preferences and configuration
 model Settings {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  splitRatioPerson1  Int      @default(50) // Percentage for person 1 (0-100)
-  splitRatioPerson2  Int      @default(50) // Percentage for person 2 (0-100)
-  person1Name        String   @default("Person 1")
-  person2Name        String   @default("Person 2")
-  authorizedEmails   String[] // List of authorized email addresses
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  splitRatioPerson1         Int      @default(50) // Percentage for person 1 (0-100)
+  splitRatioPerson2         Int      @default(50) // Percentage for person 2 (0-100)
+  person1Name               String   @default("Person 1")
+  person2Name               String   @default("Person 2")
+  authorizedEmails          String[] // List of authorized email addresses
+  checkingBalance           Float    @default(0) // Current balance in checking account
+  creditCardBalance         Float    @default(0) // Current balance in credit card (negative = owe money)
+  lineOfCreditBalance       Float    @default(0) // Current balance in line of credit (negative = owe money)
+  studentLineOfCreditBalance Float   @default(0) // Current balance in student line of credit (negative = owe money)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

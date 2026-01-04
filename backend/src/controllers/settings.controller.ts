@@ -9,6 +9,10 @@ const updateSettingsSchema = z.object({
   person1Name: z.string().min(1).optional(),
   person2Name: z.string().min(1).optional(),
   authorizedEmails: z.array(z.string().email()).optional(),
+  checkingBalance: z.number().optional(),
+  creditCardBalance: z.number().optional(),
+  lineOfCreditBalance: z.number().optional(),
+  studentLineOfCreditBalance: z.number().optional(),
 }).refine(
   (data) => {
     // If both ratios are provided, they must sum to 100

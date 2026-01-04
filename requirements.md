@@ -57,8 +57,22 @@ A web-based budget management application for a household with two income earner
 - Soft delete with archive functionality (maintain history)
 
 #### 3.1.3 Expense Categories
-- Pre-defined categories: Essentials, Home, Software & Gaming, Entertainment, Leisure
-- Ability to add custom categories
+- Pre-defined categories dropdown:
+  - Essentials
+  - Home
+  - Software & Gaming
+  - Entertainment
+  - Leisure
+  - Transportation
+  - Healthcare
+  - Insurance
+  - Utilities
+  - Groceries
+  - Dining Out
+  - Shopping
+  - Education
+  - Other
+- Category selection via dropdown (not manual entry)
 - Color-coding for visual identification
 
 ### 3.2 Account Management
@@ -66,7 +80,11 @@ A web-based budget management application for a household with two income earner
 #### 3.2.1 Account Types
 - Joint Checking Account
 - Joint Credit Card Account
+- Line of Credit (debt account)
+- Student Line of Credit (debt account)
 - Clear differentiation of expenses allocated to each account
+- Track current balance for each account in Settings
+- View balance after monthly expenses
 
 #### 3.2.2 Account Summaries
 - Total monthly expenses per account
@@ -104,16 +122,33 @@ A web-based budget management application for a household with two income earner
 
 #### 3.4.3 Contribution Calculation
 The app must calculate and display:
-- Total monthly expenses for Checking Account
-- Total monthly expenses for Credit Card Account
+- Total monthly expenses for all accounts (Checking, Credit Card, Line of Credit, Student Line of Credit)
 - Each person's contribution amount per account based on split ratio
-- Monthly contribution needed from each person for each account
+- **Part 1/Part 2 breakdown:** Show how much each person needs to contribute from their Part 1 and Part 2 income
+  - Part 1 and Part 2 contributions are proportional to their Part 1 and Part 2 income amounts
+  - This helps determine exact transfer amounts after each paycheck
+- **Remaining personal money:** Calculate and display how much money each person has left for personal expenses
+  - Show remaining amount after Part 1 contribution
+  - Show remaining amount after Part 2 contribution
+  - Show total remaining amount for the month
 - Handling of prorated yearly/quarterly expenses
+- Current balance tracking and balance after expenses for each account
 
 **Example Calculation:**
 - Total Checking expenses: $8,096.94
-- Person A (60%): $4,858.16
-- Person B (40%): $3,238.78
+- Person A (60%):
+  - Part 1 contribution: $2,429.08
+  - Part 2 contribution: $2,429.08
+  - Total: $4,858.16
+- Person B (40%):
+  - Part 1 contribution: $1,619.39
+  - Part 2 contribution: $1,619.39
+  - Total: $3,238.78
+
+**Personal Money Example:**
+- Person A Income: Part 1 ($3,000), Part 2 ($3,000), Total ($6,000)
+- Person A Contributions: Part 1 ($2,429), Part 2 ($2,429), Total ($4,858)
+- Person A Remaining: Part 1 ($571), Part 2 ($571), Total ($1,142)
 
 ### 3.5 Savings Goals
 
@@ -158,12 +193,12 @@ Display:
 {
   id: string
   name: string
-  category: string
+  category: string // Selected from predefined list
   amount: number
-  accountType: 'checking' | 'credit_card'
+  accountType: 'checking' | 'credit_card' | 'line_of_credit' | 'student_line_of_credit'
   paymentType: 'automatic' | 'manual'
   frequency: 'monthly' | 'quarterly' | 'yearly' | 'custom'
-  activeMonths: number[] // [1-12] or 'all'
+  activeMonths: number[] // [1-12], automatically all 12 for monthly
   notes: string
   createdAt: timestamp
   updatedAt: timestamp
@@ -190,6 +225,10 @@ Display:
   userEmails: string[] // Authorized Google emails
   person1Name: string
   person2Name: string
+  checkingBalance: number // Current balance in checking account
+  creditCardBalance: number // Current balance (negative if owe money)
+  lineOfCreditBalance: number // Current balance (negative for debt)
+  studentLineOfCreditBalance: number // Current balance (negative for debt)
 }
 ```
 
@@ -202,11 +241,22 @@ Display:
 - Persistent navigation
 
 ### 5.2 Key Views
-1. **Dashboard**: Overview of current month's budget
+1. **Dashboard**: Comprehensive overview with:
+   - Summary cards (Total Income, Total Expenses, Balance)
+   - 4 account cards (Checking, Credit Card, Line of Credit, Student Line of Credit) showing:
+     - Current balance
+     - Monthly expenses
+     - Part 1 and Part 2 contributions per person
+     - Balance after expenses
+   - Personal summary cards for each person showing:
+     - Income breakdown (Part 1, Part 2, Total)
+     - Contribution breakdown (Part 1, Part 2, Total)
+     - Remaining personal money (After Part 1, After Part 2, Total)
 2. **Expenses List**: Searchable, filterable list of all expenses
-3. **Add/Edit Expense**: Form for entering expense details
-4. **Income & Settings**: Manage income and app settings
-5. **Reports**: Analytics and historical data
+3. **Add/Edit Expense**: Form with predefined category dropdown and 4 account types
+4. **Income Management**: Track income by person, payment period (Part 1/Part 2), and month
+5. **Settings**: Manage split ratios, partner names, and account balances
+6. **Reports**: Analytics and historical data
 
 ### 5.3 Interactivity
 - Real-time calculation updates

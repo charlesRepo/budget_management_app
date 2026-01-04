@@ -8,6 +8,23 @@ const MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+const CATEGORIES = [
+  'Essentials',
+  'Home',
+  'Software & Gaming',
+  'Entertainment',
+  'Leisure',
+  'Transportation',
+  'Healthcare',
+  'Insurance',
+  'Utilities',
+  'Groceries',
+  'Dining Out',
+  'Shopping',
+  'Education',
+  'Other',
+];
+
 const ExpenseForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -172,13 +189,18 @@ const ExpenseForm: React.FC = () => {
         {/* Category */}
         <div style={styles.formGroup}>
           <label style={styles.label}>Category *</label>
-          <input
-            type="text"
+          <select
             value={formData.category}
             onChange={(e) => handleChange('category', e.target.value)}
-            style={styles.input}
-            placeholder="e.g., Essentials, Home, Entertainment"
-          />
+            style={styles.select}
+          >
+            <option value="">Select a category</option>
+            {CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
           {errors.category && <span style={styles.errorText}>{errors.category}</span>}
         </div>
 
@@ -206,6 +228,8 @@ const ExpenseForm: React.FC = () => {
           >
             <option value="checking">Checking Account</option>
             <option value="credit_card">Credit Card</option>
+            <option value="line_of_credit">Line of Credit</option>
+            <option value="student_line_of_credit">Student Line of Credit</option>
           </select>
         </div>
 

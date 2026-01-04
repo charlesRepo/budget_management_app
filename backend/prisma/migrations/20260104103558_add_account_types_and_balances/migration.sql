@@ -1,0 +1,5 @@
+-- AlterTable: Add account balance fields to Settings
+ALTER TABLE "Settings" ADD COLUMN "checkingBalance" DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE "Settings" ADD COLUMN "creditCardBalance" DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE "Settings" ADD COLUMN "lineOfCreditBalance" DOUBLE PRECISION NOT NULL DEFAULT 0;
+ALTER TABLE "Settings" ADD COLUMN "studentLineOfCreditBalance" DOUBLE PRECISION NOT NULL DEFAULT 0;
