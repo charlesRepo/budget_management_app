@@ -86,6 +86,14 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* Credits */}
+        {account.credits > 0 && (
+          <div style={styles.creditsSection}>
+            <div style={styles.creditsLabel}>Monthly Credits:</div>
+            <div style={styles.creditsAmount}>+${account.credits.toFixed(2)}</div>
+          </div>
+        )}
+
         <div style={styles.divider} />
 
         {/* Contributions */}
@@ -191,9 +199,138 @@ const Dashboard: React.FC = () => {
       <div style={styles.accountsGrid}>
         {renderAccountCard('Checking Account', calculations.checking, 'blue')}
         {renderAccountCard('Credit Card', calculations.creditCard, 'orange')}
-        {renderAccountCard('Line of Credit', calculations.lineOfCredit, 'red')}
+        {renderAccountCard('Personal Line of Credit', calculations.lineOfCredit, 'red')}
         {renderAccountCard('Student Line of Credit', calculations.studentLineOfCredit, 'purple')}
       </div>
+
+      {/* Savings Section */}
+      {calculations.savings && calculations.savings.totalGoal > 0 && (
+        <div style={styles.savingsCard}>
+          <h2 style={styles.savingsTitle}>Monthly Savings Goals</h2>
+          <div style={styles.savingsSubtitle}>
+            Total Goal: ${calculations.savings.totalGoal.toFixed(2)}
+          </div>
+
+          <div style={styles.savingsGrid}>
+            {/* Travel Savings */}
+            {calculations.savings.travelGoal > 0 && (
+              <div style={styles.savingsCategory}>
+                <h3 style={styles.categoryTitle}>Travel Savings: ${calculations.savings.travelGoal.toFixed(2)}</h3>
+                <div style={styles.categoryBreakdown}>
+                  <div style={styles.categoryPerson}>
+                    <div style={styles.categoryPersonHeader}>{person1Name}</div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 1:</span>
+                      <span>${calculations.savings.person1.travel.part1.toFixed(2)}</span>
+                    </div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 2:</span>
+                      <span>${calculations.savings.person1.travel.part2.toFixed(2)}</span>
+                    </div>
+                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                      <span><strong>Total:</strong></span>
+                      <span><strong>${calculations.savings.person1.travel.total.toFixed(2)}</strong></span>
+                    </div>
+                  </div>
+                  <div style={styles.categoryPerson}>
+                    <div style={styles.categoryPersonHeader}>{person2Name}</div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 1:</span>
+                      <span>${calculations.savings.person2.travel.part1.toFixed(2)}</span>
+                    </div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 2:</span>
+                      <span>${calculations.savings.person2.travel.part2.toFixed(2)}</span>
+                    </div>
+                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                      <span><strong>Total:</strong></span>
+                      <span><strong>${calculations.savings.person2.travel.total.toFixed(2)}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Home Savings */}
+            {calculations.savings.homeGoal > 0 && (
+              <div style={styles.savingsCategory}>
+                <h3 style={styles.categoryTitle}>Home Savings: ${calculations.savings.homeGoal.toFixed(2)}</h3>
+                <div style={styles.categoryBreakdown}>
+                  <div style={styles.categoryPerson}>
+                    <div style={styles.categoryPersonHeader}>{person1Name}</div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 1:</span>
+                      <span>${calculations.savings.person1.home.part1.toFixed(2)}</span>
+                    </div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 2:</span>
+                      <span>${calculations.savings.person1.home.part2.toFixed(2)}</span>
+                    </div>
+                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                      <span><strong>Total:</strong></span>
+                      <span><strong>${calculations.savings.person1.home.total.toFixed(2)}</strong></span>
+                    </div>
+                  </div>
+                  <div style={styles.categoryPerson}>
+                    <div style={styles.categoryPersonHeader}>{person2Name}</div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 1:</span>
+                      <span>${calculations.savings.person2.home.part1.toFixed(2)}</span>
+                    </div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 2:</span>
+                      <span>${calculations.savings.person2.home.part2.toFixed(2)}</span>
+                    </div>
+                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                      <span><strong>Total:</strong></span>
+                      <span><strong>${calculations.savings.person2.home.total.toFixed(2)}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* General Savings */}
+            {calculations.savings.generalGoal > 0 && (
+              <div style={styles.savingsCategory}>
+                <h3 style={styles.categoryTitle}>General Savings: ${calculations.savings.generalGoal.toFixed(2)}</h3>
+                <div style={styles.categoryBreakdown}>
+                  <div style={styles.categoryPerson}>
+                    <div style={styles.categoryPersonHeader}>{person1Name}</div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 1:</span>
+                      <span>${calculations.savings.person1.general.part1.toFixed(2)}</span>
+                    </div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 2:</span>
+                      <span>${calculations.savings.person1.general.part2.toFixed(2)}</span>
+                    </div>
+                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                      <span><strong>Total:</strong></span>
+                      <span><strong>${calculations.savings.person1.general.total.toFixed(2)}</strong></span>
+                    </div>
+                  </div>
+                  <div style={styles.categoryPerson}>
+                    <div style={styles.categoryPersonHeader}>{person2Name}</div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 1:</span>
+                      <span>${calculations.savings.person2.general.part1.toFixed(2)}</span>
+                    </div>
+                    <div style={styles.categoryItem}>
+                      <span>Part 2:</span>
+                      <span>${calculations.savings.person2.general.part2.toFixed(2)}</span>
+                    </div>
+                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                      <span><strong>Total:</strong></span>
+                      <span><strong>${calculations.savings.person2.general.total.toFixed(2)}</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Person Summary Cards */}
       <div style={styles.personSummaryGrid}>
@@ -473,6 +610,25 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '4px 0',
     color: '#666',
   },
+  creditsSection: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 12px',
+    backgroundColor: '#e8f5e9',
+    borderRadius: '4px',
+    marginTop: '12px',
+  },
+  creditsLabel: {
+    fontSize: '14px',
+    fontWeight: '500',
+    color: '#2e7d32',
+  },
+  creditsAmount: {
+    fontSize: '15px',
+    fontWeight: '600',
+    color: '#2e7d32',
+  },
   divider: {
     height: '1px',
     backgroundColor: '#e0e0e0',
@@ -527,6 +683,75 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '13px',
     color: '#666',
     marginTop: '8px',
+  },
+
+  // Savings Section
+  savingsCard: {
+    backgroundColor: 'white',
+    padding: '24px',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    marginBottom: '32px',
+    borderLeft: '4px solid #9c27b0',
+  },
+  savingsTitle: {
+    fontSize: '22px',
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: '8px',
+  },
+  savingsSubtitle: {
+    fontSize: '16px',
+    color: '#666',
+    marginBottom: '20px',
+    fontWeight: '500',
+  },
+  savingsGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: '20px',
+  },
+  savingsCategory: {
+    padding: '16px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '6px',
+    border: '1px solid #e0e0e0',
+  },
+  categoryTitle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    color: '#9c27b0',
+    marginBottom: '12px',
+  },
+  categoryBreakdown: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '12px',
+  },
+  categoryPerson: {
+    padding: '12px',
+    backgroundColor: 'white',
+    borderRadius: '4px',
+    border: '1px solid #e0e0e0',
+  },
+  categoryPersonHeader: {
+    fontSize: '13px',
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: '8px',
+  },
+  categoryItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    padding: '4px 0',
+    fontSize: '12px',
+    color: '#666',
+  },
+  categoryTotal: {
+    marginTop: '6px',
+    paddingTop: '6px',
+    borderTop: '1px solid #e0e0e0',
+    color: '#333',
   },
 
   // Person Summary Cards

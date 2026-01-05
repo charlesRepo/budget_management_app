@@ -16,6 +16,7 @@ interface AccountCalculation {
   manualPayments: number;
   currentBalance: number;
   balanceAfterExpenses: number;
+  credits: number;
 }
 
 interface PersonCalculation {
@@ -62,37 +63,23 @@ type AccountType = 'checking' | 'credit_card' | 'line_of_credit' | 'student_line
 
 export const calculationService = {
   /**
-   * Calculate prorated monthly amount for an expense based on frequency and active months
+   * Calculate monthly amount for an expense based on frequency and active months
+   * Returns the FULL amount if the expense is active in the given month, 0 otherwise
    */
   calculateProratedAmount(expense: Expense, month: number): number {
-    const { amount, frequency, activeMonths } = expense;
+    const { amount, activeMonths } = expense;
 
     // Check if expense is active this month
     if (!activeMonths.includes(month)) {
       return 0;
     }
 
-    switch (frequency) {
-      case 'monthly':
-        // Monthly expenses: full amount every month
-        return amount;
-
-      case 'yearly':
-        // Yearly expenses: divide by 12, only in active month(s)
-        return amount / 12;
-
-      case 'quarterly':
-        // Quarterly expenses: divide by 3
-        // Amount should be spread across the months it's active
-        return amount / 3;
-
-      case 'custom':
-        // Custom: divide by number of active months
-        return amount / activeMonths.length;
-
-      default:
-        return amount;
-    }
+    // All frequencies now charge the FULL amount in active months (no proration)
+    // - Monthly: Full amount every month (all 12 months active)
+    // - Yearly: Full amount in selected month(s) only
+    // - Quarterly: Full amount in selected quarter months only
+    // - Custom: Full amount in each selected month
+    return amount;
   },
 
   /**
@@ -416,6 +403,7 @@ export const calculationService = {
         manualPayments: checkingTotals.manual,
         currentBalance: effectiveSettings.checkingBalance,
         balanceAfterExpenses: effectiveSettings.checkingBalance - checkingTotals.total + credits.checking,
+        credits: credits.checking,
       },
       creditCard: {
         totalExpenses: creditCardTotals.total,
@@ -425,6 +413,7 @@ export const calculationService = {
         manualPayments: creditCardTotals.manual,
         currentBalance: effectiveSettings.creditCardBalance,
         balanceAfterExpenses: effectiveSettings.creditCardBalance - creditCardTotals.total + credits.creditCard,
+        credits: credits.creditCard,
       },
       lineOfCredit: {
         totalExpenses: lineOfCreditTotals.total,
@@ -434,6 +423,7 @@ export const calculationService = {
         manualPayments: lineOfCreditTotals.manual,
         currentBalance: effectiveSettings.lineOfCreditBalance,
         balanceAfterExpenses: effectiveSettings.lineOfCreditBalance - lineOfCreditTotals.total + credits.lineOfCredit,
+        credits: credits.lineOfCredit,
       },
       studentLineOfCredit: {
         totalExpenses: studentLineOfCreditTotals.total,
@@ -443,6 +433,7 @@ export const calculationService = {
         manualPayments: studentLineOfCreditTotals.manual,
         currentBalance: effectiveSettings.studentLineOfCreditBalance,
         balanceAfterExpenses: effectiveSettings.studentLineOfCreditBalance - studentLineOfCreditTotals.total + credits.studentLineOfCredit,
+        credits: credits.studentLineOfCredit,
       },
       savings: {
         person1: {

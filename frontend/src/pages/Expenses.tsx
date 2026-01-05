@@ -59,11 +59,25 @@ const Expenses: React.FC = () => {
   };
 
   const formatAccountType = (type: string) => {
-    return type === 'checking' ? 'Checking' : 'Credit Card';
+    const typeMap: { [key: string]: string } = {
+      checking: 'Checking',
+      credit_card: 'Credit Card',
+      line_of_credit: 'Personal Line of Credit',
+      student_line_of_credit: 'Student Line of Credit',
+    };
+    return typeMap[type] || type;
   };
 
   const formatPaymentType = (type: string) => {
     return type === 'automatic' ? 'Automatic' : 'Manual';
+  };
+
+  const getMonthTags = (frequency: string, activeMonths: number[]) => {
+    // Don't show tags for monthly expenses (all 12 months are active)
+    if (frequency === 'monthly') return null;
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return activeMonths.map(monthNum => monthNames[monthNum - 1]).join(', ');
   };
 
   if (loading) {
@@ -111,6 +125,8 @@ const Expenses: React.FC = () => {
             <option value="">All Accounts</option>
             <option value="checking">Checking</option>
             <option value="credit_card">Credit Card</option>
+            <option value="line_of_credit">Personal Line of Credit</option>
+            <option value="student_line_of_credit">Student Line of Credit</option>
           </select>
 
           <select
@@ -154,6 +170,13 @@ const Expenses: React.FC = () => {
                 <span style={styles.badge}>{formatPaymentType(expense.paymentType)}</span>
                 <span style={styles.badge}>{expense.frequency}</span>
               </div>
+
+              {getMonthTags(expense.frequency, expense.activeMonths) && (
+                <div style={styles.monthTags}>
+                  <span style={styles.monthTagsLabel}>Active Months:</span>
+                  <span style={styles.monthTagsValue}>{getMonthTags(expense.frequency, expense.activeMonths)}</span>
+                </div>
+              )}
 
               {expense.notes && (
                 <p style={styles.notes}>{expense.notes}</p>
@@ -343,6 +366,22 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#f0f0f0',
     color: '#666',
     borderRadius: '12px',
+  },
+  monthTags: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '12px',
+    padding: '8px 12px',
+    backgroundColor: '#e3f2fd',
+    borderRadius: '4px',
+    fontSize: '13px',
+  },
+  monthTagsLabel: {
+    fontWeight: '600',
+    color: '#1976d2',
+  },
+  monthTagsValue: {
+    color: '#1565c0',
   },
   notes: {
     fontSize: '14px',

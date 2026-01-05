@@ -137,6 +137,7 @@ export interface AccountCalculation {
   manualPayments: number;
   currentBalance: number;
   balanceAfterExpenses: number;
+  credits: number;
 }
 
 export interface SavingsCalculation {

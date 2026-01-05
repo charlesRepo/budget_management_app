@@ -228,7 +228,7 @@ const ExpenseForm: React.FC = () => {
           >
             <option value="checking">Checking Account</option>
             <option value="credit_card">Credit Card</option>
-            <option value="line_of_credit">Line of Credit</option>
+            <option value="line_of_credit">Personal Line of Credit</option>
             <option value="student_line_of_credit">Student Line of Credit</option>
           </select>
         </div>
@@ -259,6 +259,12 @@ const ExpenseForm: React.FC = () => {
             <option value="yearly">Yearly</option>
             <option value="custom">Custom</option>
           </select>
+          <p style={styles.helper}>
+            {formData.frequency === 'monthly' && '• Full amount charged every month'}
+            {formData.frequency === 'yearly' && '• Full amount charged once per year in selected month(s)'}
+            {formData.frequency === 'quarterly' && '• Full amount charged in each selected quarter month'}
+            {formData.frequency === 'custom' && '• Full amount charged in each selected month'}
+          </p>
         </div>
 
         {/* Active Months - Only show for non-monthly frequencies */}

@@ -193,7 +193,7 @@ const Settings: React.FC = () => {
             </div>
 
             <div style={styles.formGroup}>
-              <label style={styles.label}>Line of Credit Balance ($)</label>
+              <label style={styles.label}>Personal Line of Credit Balance ($)</label>
               <input
                 type="number"
                 step="0.01"
