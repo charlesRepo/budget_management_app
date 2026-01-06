@@ -47,7 +47,8 @@ const Dashboard: React.FC = () => {
   const renderAccountCard = (
     title: string,
     account: AccountCalculation,
-    colorScheme: 'blue' | 'orange' | 'red' | 'purple'
+    colorScheme: 'blue' | 'orange' | 'red' | 'purple',
+    showContributions: boolean = true
   ) => {
     const colors = {
       blue: { bg: '#e3f2fd', border: '#2196f3', text: '#1565c0' },
@@ -94,53 +95,55 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        <div style={styles.divider} />
+        {showContributions && <div style={styles.divider} />}
 
         {/* Contributions */}
-        <div style={styles.contributionSection}>
-          <h3 style={styles.contributionTitle}>Contributions Needed</h3>
+        {showContributions && (
+          <div style={styles.contributionSection}>
+            <h3 style={styles.contributionTitle}>Contributions Needed</h3>
 
-          {/* Person 1 */}
-          <div style={styles.personContribution}>
-            <div style={styles.personContributionHeader}>{person1Name}</div>
-            <div style={styles.partBreakdown}>
-              <div style={styles.partItem}>
-                <span>Part 1:</span>
-                <span style={styles.partAmount}>${account.person1Share.part1.toFixed(2)}</span>
+            {/* Person 1 */}
+            <div style={styles.personContribution}>
+              <div style={styles.personContributionHeader}>{person1Name}</div>
+              <div style={styles.partBreakdown}>
+                <div style={styles.partItem}>
+                  <span>Part 1:</span>
+                  <span style={styles.partAmount}>${account.person1Share.part1.toFixed(2)}</span>
+                </div>
+                <div style={styles.partItem}>
+                  <span>Part 2:</span>
+                  <span style={styles.partAmount}>${account.person1Share.part2.toFixed(2)}</span>
+                </div>
+                <div style={{ ...styles.partItem, ...styles.totalPart }}>
+                  <span><strong>Total:</strong></span>
+                  <span style={styles.contributionAmount}><strong>${account.person1Share.total.toFixed(2)}</strong></span>
+                </div>
               </div>
-              <div style={styles.partItem}>
-                <span>Part 2:</span>
-                <span style={styles.partAmount}>${account.person1Share.part2.toFixed(2)}</span>
-              </div>
-              <div style={{ ...styles.partItem, ...styles.totalPart }}>
-                <span><strong>Total:</strong></span>
-                <span style={styles.contributionAmount}><strong>${account.person1Share.total.toFixed(2)}</strong></span>
+            </div>
+
+            {/* Person 2 */}
+            <div style={styles.personContribution}>
+              <div style={styles.personContributionHeader}>{person2Name}</div>
+              <div style={styles.partBreakdown}>
+                <div style={styles.partItem}>
+                  <span>Part 1:</span>
+                  <span style={styles.partAmount}>${account.person2Share.part1.toFixed(2)}</span>
+                </div>
+                <div style={styles.partItem}>
+                  <span>Part 2:</span>
+                  <span style={styles.partAmount}>${account.person2Share.part2.toFixed(2)}</span>
+                </div>
+                <div style={{ ...styles.partItem, ...styles.totalPart }}>
+                  <span><strong>Total:</strong></span>
+                  <span style={styles.contributionAmount}><strong>${account.person2Share.total.toFixed(2)}</strong></span>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Person 2 */}
-          <div style={styles.personContribution}>
-            <div style={styles.personContributionHeader}>{person2Name}</div>
-            <div style={styles.partBreakdown}>
-              <div style={styles.partItem}>
-                <span>Part 1:</span>
-                <span style={styles.partAmount}>${account.person2Share.part1.toFixed(2)}</span>
-              </div>
-              <div style={styles.partItem}>
-                <span>Part 2:</span>
-                <span style={styles.partAmount}>${account.person2Share.part2.toFixed(2)}</span>
-              </div>
-              <div style={{ ...styles.partItem, ...styles.totalPart }}>
-                <span><strong>Total:</strong></span>
-                <span style={styles.contributionAmount}><strong>${account.person2Share.total.toFixed(2)}</strong></span>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Balance After Expenses */}
-        <div style={styles.divider} />
+        {showContributions && <div style={styles.divider} />}
         <div style={styles.balanceAfter}>
           <span>Balance After Expenses:</span>
           <span style={{ fontWeight: '600', color: account.balanceAfterExpenses >= 0 ? '#4caf50' : '#f44336' }}>
@@ -197,10 +200,10 @@ const Dashboard: React.FC = () => {
 
       {/* Account Cards */}
       <div style={styles.accountsGrid}>
-        {renderAccountCard('Checking Account', calculations.checking, 'blue')}
-        {renderAccountCard('Credit Card', calculations.creditCard, 'orange')}
-        {renderAccountCard('Personal Line of Credit', calculations.lineOfCredit, 'red')}
-        {renderAccountCard('Student Line of Credit', calculations.studentLineOfCredit, 'purple')}
+        {renderAccountCard('Checking Account', calculations.checking, 'blue', true)}
+        {renderAccountCard('Credit Card', calculations.creditCard, 'orange', true)}
+        {renderAccountCard('Personal Line of Credit', calculations.lineOfCredit, 'red', false)}
+        {renderAccountCard('Student Line of Credit', calculations.studentLineOfCredit, 'purple', false)}
       </div>
 
       {/* Savings Section */}
