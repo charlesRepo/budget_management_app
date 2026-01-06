@@ -7,7 +7,7 @@ const createIncomeSchema = z.object({
   personName: z.string().min(1, 'Person name is required'),
   amount: z.number().positive('Amount must be positive'),
   month: z.string().regex(/^\d{4}-\d{2}$/, 'Month must be in YYYY-MM format'),
-  paymentPeriod: z.enum(['part1', 'part2'], { errorMap: () => ({ message: 'Payment period must be either part1 or part2' }) }),
+  paymentPeriod: z.enum(['part1', 'part2'], { message: 'Payment period must be either part1 or part2' }),
 });
 
 const updateIncomeSchema = z.object({
@@ -63,7 +63,7 @@ export const incomeController = {
       res.status(201).json({ income });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid income data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid income data', details: error.issues });
       }
       console.error('Create income error:', error);
       res.status(500).json({ error: 'Failed to create income' });
@@ -86,7 +86,7 @@ export const incomeController = {
       res.json({ income });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid income data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid income data', details: error.issues });
       }
       console.error('Update income error:', error);
       res.status(500).json({ error: 'Failed to update income' });

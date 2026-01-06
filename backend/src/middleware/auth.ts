@@ -2,19 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../config/jwt';
 import prisma from '../config/prisma';
 
-// Extend Express Request type to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        email: string;
-        name: string | null;
-      };
-    }
-  }
-}
-
 export const authenticateJWT = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // Get token from Authorization header
@@ -40,7 +27,6 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
     // Get user from database
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      select: { id: true, email: true, name: true },
     });
 
     if (!user) {

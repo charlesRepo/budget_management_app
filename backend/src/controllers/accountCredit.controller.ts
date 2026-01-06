@@ -63,7 +63,7 @@ export const accountCreditController = {
       res.status(201).json({ credit });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid account credit data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid account credit data', details: error.issues });
       }
       console.error('Create account credit error:', error);
       res.status(500).json({ error: 'Failed to create account credit' });
@@ -86,7 +86,7 @@ export const accountCreditController = {
       res.json({ credit });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid account credit data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid account credit data', details: error.issues });
       }
       console.error('Update account credit error:', error);
       res.status(500).json({ error: 'Failed to update account credit' });

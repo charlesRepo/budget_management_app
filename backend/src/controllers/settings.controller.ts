@@ -57,7 +57,7 @@ export const settingsController = {
       res.json({ settings });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid settings data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid settings data', details: error.issues });
       }
       if (error instanceof Error && error.message === 'Split ratios must sum to 100') {
         return res.status(400).json({ error: error.message });

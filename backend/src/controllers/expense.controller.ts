@@ -21,7 +21,7 @@ export const expenseController = {
       res.json({ expenses });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid filters', details: error.errors });
+        return res.status(400).json({ error: 'Invalid filters', details: error.issues });
       }
       console.error('Get expenses error:', error);
       res.status(500).json({ error: 'Failed to fetch expenses' });
@@ -60,7 +60,7 @@ export const expenseController = {
       res.status(201).json({ expense });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid expense data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid expense data', details: error.issues });
       }
       console.error('Create expense error:', error);
       res.status(500).json({ error: 'Failed to create expense' });
@@ -85,7 +85,7 @@ export const expenseController = {
       res.json({ expense });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid expense data', details: error.errors });
+        return res.status(400).json({ error: 'Invalid expense data', details: error.issues });
       }
       console.error('Update expense error:', error);
       res.status(500).json({ error: 'Failed to update expense' });
