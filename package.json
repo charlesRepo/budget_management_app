@@ -1,0 +1,17 @@
+{
+  "name": "budget-management-app",
+  "version": "1.0.0",
+  "description": "Budget Management Application for Household Finance Tracking",
+  "private": true,
+  "scripts": {
+    "render:build": "npm install --prefix backend && npm run build --prefix backend && npm run prisma:generate --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "render:start": "cd backend && npm start"
+  },
+  "keywords": [
+    "budget",
+    "finance",
+    "household"
+  ],
+  "author": "",
+  "license": "MIT"
+}
