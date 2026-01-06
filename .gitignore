@@ -38,12 +38,7 @@ coverage/
 *.tmp
 
 # Test and debug scripts
-backend/check-*.ts
-backend/debug-*.ts
-backend/examine-*.ts
-backend/generate-test-token.ts
-backend/transfer-data.ts
-backend/test-*.sh
+backend/scripts/
 backend/TEST_RESULTS.md
 
 # Personal data files
