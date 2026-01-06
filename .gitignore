@@ -3,6 +3,10 @@ node_modules/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+Budget Management 2026.xlsx
+requirements.md
+plan.md
+backend/prisma/seed.ts
 
 # Environment variables
 .env
@@ -32,3 +36,16 @@ coverage/
 # Misc
 *.bak
 *.tmp
+
+# Test and debug scripts
+backend/check-*.ts
+backend/debug-*.ts
+backend/examine-*.ts
+backend/generate-test-token.ts
+backend/transfer-data.ts
+backend/test-*.sh
+backend/TEST_RESULTS.md
+
+# Personal data files
+*.csv
+Budget Management*.xlsx
