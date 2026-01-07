@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { expenseService } from '../services/expenses';
-import type { CreateExpenseInput, Expense, AccountType, PaymentType, Frequency } from '../types';
+import type { CreateExpenseInput, AccountType, PaymentType, Frequency } from '../types';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',

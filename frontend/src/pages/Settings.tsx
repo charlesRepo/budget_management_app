@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { settingsService } from '../services/settings';
-import type { Settings as SettingsType, UpdateSettingsInput } from '../types';
+import type { UpdateSettingsInput } from '../types';
 
 const Settings: React.FC = () => {
-  const [settings, setSettings] = useState<SettingsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<UpdateSettingsInput>({});
-  const [showBalances, setShowBalances] = useState(false);
 
   useEffect(() => {
     fetchSettings();
@@ -17,7 +15,6 @@ const Settings: React.FC = () => {
     try {
       setLoading(true);
       const data = await settingsService.getSettings();
-      setSettings(data);
       setFormData({
         splitRatioPerson1: data.splitRatioPerson1,
         splitRatioPerson2: data.splitRatioPerson2,
@@ -56,8 +53,7 @@ const Settings: React.FC = () => {
 
     try {
       setSaving(true);
-      const updated = await settingsService.updateSettings(formData);
-      setSettings(updated);
+      await settingsService.updateSettings(formData);
       alert('Settings saved successfully!');
     } catch (error: any) {
       console.error('Failed to update settings:', error);

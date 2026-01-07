@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
 import { calculationService } from '../services/calculations';
 import { settingsService } from '../services/settings';
 import type { MonthlyCalculation, Settings, AccountCalculation } from '../types';
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
   const [calculations, setCalculations] = useState<MonthlyCalculation | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
