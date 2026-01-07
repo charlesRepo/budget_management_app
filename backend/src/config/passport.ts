@@ -24,6 +24,15 @@ passport.use(
           return done(new Error('No email found in Google profile'), undefined);
         }
 
+        // Check if email is authorized (if AUTHORIZED_EMAILS is set)
+        const authorizedEmailsEnv = process.env.AUTHORIZED_EMAILS;
+        if (authorizedEmailsEnv) {
+          const authorizedEmails = authorizedEmailsEnv.split(',').map(e => e.trim().toLowerCase());
+          if (!authorizedEmails.includes(email.toLowerCase())) {
+            return done(new Error('Email address not authorized to access this application'), undefined);
+          }
+        }
+
         // Find or create user in database
         let user = await prisma.user.findUnique({
           where: { googleId },
