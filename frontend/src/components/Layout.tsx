@@ -23,9 +23,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
+          <h1 style={styles.logo} onClick={() => navigate('/')}>CRH Budget Management App</h1>
+
+          <div style={styles.userSection}>
+              <span style={styles.userName}>{user?.name || user?.email}</span>
+              <button onClick={handleLogout} style={styles.logoutButton}>
+                  Logout
+              </button>
+          </div>
+
         <div style={styles.headerContent}>
           <div style={styles.leftSection}>
-            <h1 style={styles.logo} onClick={() => navigate('/')}>Budget Manager</h1>
             <nav style={styles.nav}>
               <button
                 onClick={() => navigate('/')}
@@ -65,12 +73,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
             </nav>
           </div>
-          <div style={styles.userSection}>
-            <span style={styles.userName}>{user?.name || user?.email}</span>
-            <button onClick={handleLogout} style={styles.logoutButton}>
-              Logout
-            </button>
-          </div>
+
         </div>
       </header>
       <main style={styles.main}>{children}</main>
@@ -93,7 +96,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     margin: '0 auto',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     height: '64px',
   },
   leftSection: {
@@ -107,6 +110,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#333',
     margin: 0,
     cursor: 'pointer',
+    textAlign: 'center',
+    padding: '20px 0',
+    borderBottom: '1px solid #e5e5e5',
   },
   nav: {
     display: 'flex',
@@ -130,6 +136,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   userSection: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
+    padding: '16px',
     gap: '16px',
   },
   userName: {
