@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { expenseService } from '../services/expenses';
 import type { Expense, ExpenseFilters } from '../types';
-import { colors, spacing, borderRadius, shadows, commonStyles, pageContainer } from '../styles/theme';
+import { colors, spacing, borderRadius, commonStyles, pageContainer } from '../styles/theme';
 
 const Expenses: React.FC = () => {
   const navigate = useNavigate();

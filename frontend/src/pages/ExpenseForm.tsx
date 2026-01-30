@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { expenseService } from '../services/expenses';
 import type { CreateExpenseInput, AccountType, PaymentType, Frequency } from '../types';
-import { colors, spacing, borderRadius, shadows, commonStyles, pageContainer } from '../styles/theme';
+import { colors, spacing, borderRadius, commonStyles, pageContainer } from '../styles/theme';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',

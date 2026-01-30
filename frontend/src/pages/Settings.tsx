@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { settingsService } from '../services/settings';
 import type { UpdateSettingsInput } from '../types';
-import { colors, spacing, borderRadius, shadows, commonStyles, pageContainer } from '../styles/theme';
+import { colors, spacing, borderRadius, commonStyles, pageContainer } from '../styles/theme';
 
 const Settings: React.FC = () => {
   const navigate = useNavigate();

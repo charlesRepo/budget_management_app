@@ -3,7 +3,7 @@ import { incomeService } from '../services/income';
 import { settingsService } from '../services/settings';
 import { accountCreditService } from '../services/accountCredits';
 import type { Income, CreateIncomeInput, Settings, PaymentPeriod, AccountCredit, CreateAccountCreditInput, AccountType } from '../types';
-import { colors, spacing, borderRadius, shadows, commonStyles, pageContainer } from '../styles/theme';
+import { colors, spacing, borderRadius, commonStyles, pageContainer } from '../styles/theme';
 
 const IncomeManagement: React.FC = () => {
   const [incomes, setIncomes] = useState<Income[]>([]);
