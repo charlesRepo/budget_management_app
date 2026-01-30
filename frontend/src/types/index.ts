@@ -4,7 +4,7 @@ export interface User {
   name: string | null;
 }
 
-export type AccountType = 'checking' | 'credit_card' | 'line_of_credit' | 'student_line_of_credit';
+export type AccountType = 'checking' | 'credit_card';
 export type PaymentType = 'automatic' | 'manual';
 export type Frequency = 'monthly' | 'quarterly' | 'yearly' | 'custom';
 
@@ -86,6 +86,8 @@ export interface UpdateIncomeInput {
 }
 
 // Settings types
+export type SavingsAssignment = 'person1' | 'person2' | 'shared';
+
 export interface Settings {
   id: string;
   userId: string;
@@ -97,11 +99,12 @@ export interface Settings {
   authorizedEmails: string[];
   checkingBalance: number;
   creditCardBalance: number;
-  lineOfCreditBalance: number;
-  studentLineOfCreditBalance: number;
   travelSavings: number;
   homeSavings: number;
   generalSavings: number;
+  travelSavingsAssignedTo: SavingsAssignment;
+  homeSavingsAssignedTo: SavingsAssignment;
+  generalSavingsAssignedTo: SavingsAssignment;
   createdAt: string;
   updatedAt: string;
 }
@@ -115,11 +118,12 @@ export interface UpdateSettingsInput {
   authorizedEmails?: string[];
   checkingBalance?: number;
   creditCardBalance?: number;
-  lineOfCreditBalance?: number;
-  studentLineOfCreditBalance?: number;
   travelSavings?: number;
   homeSavings?: number;
   generalSavings?: number;
+  travelSavingsAssignedTo?: SavingsAssignment;
+  homeSavingsAssignedTo?: SavingsAssignment;
+  generalSavingsAssignedTo?: SavingsAssignment;
 }
 
 // Calculation types
@@ -151,8 +155,6 @@ export interface MonthlyCalculation {
   month: string;
   checking: AccountCalculation;
   creditCard: AccountCalculation;
-  lineOfCredit: AccountCalculation;
-  studentLineOfCredit: AccountCalculation;
   savings: {
     person1: SavingsCalculation;
     person2: SavingsCalculation;
@@ -198,6 +200,8 @@ export interface AccountCredit {
   month: string;
   createdAt: string;
   updatedAt: string;
+  isInherited?: boolean; // True if inherited from previous month
+  originalMonth?: string; // The month it was originally created in
 }
 
 export interface CreateAccountCreditInput {

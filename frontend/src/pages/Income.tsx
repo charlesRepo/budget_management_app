@@ -9,9 +9,11 @@ const IncomeManagement: React.FC = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toISOString().slice(0, 7) // YYYY-MM
-  );
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    // Try to load from localStorage, fallback to current month
+    const saved = localStorage.getItem('selectedMonth');
+    return saved || new Date().toISOString().slice(0, 7);
+  });
   const [formData, setFormData] = useState<CreateIncomeInput>({
     personName: '',
     amount: 0,
@@ -30,13 +32,17 @@ const IncomeManagement: React.FC = () => {
     month: selectedMonth,
   });
 
-  const hasInheritedRecords = incomes.some(income => income.isInherited);
+  const hasInheritedIncome = incomes.some(income => income.isInherited);
+  const hasInheritedCredits = credits.some(credit => credit.isInherited);
+  const hasInheritedRecords = hasInheritedIncome || hasInheritedCredits;
 
   useEffect(() => {
     fetchData();
     // Update form data month when selected month changes
     setFormData(prev => ({ ...prev, month: selectedMonth }));
     setCreditFormData(prev => ({ ...prev, month: selectedMonth }));
+    // Save selected month to localStorage
+    localStorage.setItem('selectedMonth', selectedMonth);
   }, [selectedMonth]);
 
   const fetchData = async () => {
@@ -92,14 +98,14 @@ const IncomeManagement: React.FC = () => {
   };
 
   const handleApplyInherited = async () => {
-    if (!window.confirm('Apply all inherited income records for this month?')) return;
+    if (!window.confirm('Apply all inherited income and credits for this month?')) return;
     try {
       setApplying(true);
-      await incomeService.applyInheritedIncome(selectedMonth);
+      await incomeService.applyAllInherited(selectedMonth);
       fetchData();
     } catch (error) {
-      console.error('Failed to apply inherited income:', error);
-      alert('Failed to apply inherited income');
+      console.error('Failed to apply inherited records:', error);
+      alert('Failed to apply inherited records');
     } finally {
       setApplying(false);
     }
@@ -159,10 +165,8 @@ const IncomeManagement: React.FC = () => {
     const typeMap: Record<AccountType, string> = {
       checking: 'Checking',
       credit_card: 'Credit Card',
-      line_of_credit: 'Personal Line of Credit',
-      student_line_of_credit: 'Student Line of Credit',
     };
-    return typeMap[accountType];
+    return typeMap[accountType] || accountType;
   };
 
   const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
@@ -221,25 +225,28 @@ const IncomeManagement: React.FC = () => {
         </form>
       </div>
 
+      {hasInheritedRecords && (
+        <div style={styles.inheritedGlobalNotice}>
+          <div>
+            <strong>ℹ️ Inherited Records Found</strong>
+            <p style={{ margin: '4px 0 0 0', fontSize: '14px' }}>
+              Income and/or credit records from the previous month are displayed below. Click the button to save them for {selectedMonth}.
+            </p>
+          </div>
+          <button
+            onClick={handleApplyInherited}
+            disabled={applying}
+            style={styles.applyButton}
+          >
+            {applying ? 'Applying...' : 'Apply for This Month'}
+          </button>
+        </div>
+      )}
+
       <div style={styles.card}>
         <div style={styles.cardHeader}>
           <h2>Income Records for {selectedMonth}</h2>
-          {hasInheritedRecords && (
-            <button
-              onClick={handleApplyInherited}
-              disabled={applying}
-              style={styles.applyButton}
-            >
-              {applying ? 'Applying...' : 'Apply for This Month'}
-            </button>
-          )}
         </div>
-
-        {hasInheritedRecords && (
-          <div style={styles.inheritedNotice}>
-            <strong>ℹ️ Inherited Income:</strong> These records are from the previous month. Click "Apply for This Month" to save them for {selectedMonth}.
-          </div>
-        )}
 
         {incomes.length === 0 ? (
           <p>No income records for this month</p>
@@ -315,16 +322,7 @@ const IncomeManagement: React.FC = () => {
             >
               <option value="checking">Checking</option>
               <option value="credit_card">Credit Card</option>
-              <option value="line_of_credit">Personal Line of Credit</option>
-              <option value="student_line_of_credit">Student Line of Credit</option>
             </select>
-            <input
-              type="month"
-              value={creditFormData.month}
-              onChange={(e) => setCreditFormData({ ...creditFormData, month: e.target.value })}
-              required
-              style={styles.input}
-            />
             <button type="submit" style={styles.button}>
               {editingCredit ? 'Update Credit' : 'Add Credit'}
             </button>
@@ -345,22 +343,35 @@ const IncomeManagement: React.FC = () => {
                 <div style={{ flex: 2 }}>Description</div>
                 <div style={{ flex: 1 }}>Amount</div>
                 <div style={{ flex: 1 }}>Account</div>
-                <div style={{ flex: 1 }}>Month</div>
                 <div style={{ flex: 1 }}>Actions</div>
               </div>
               {credits.map((credit) => (
-                <div key={credit.id} style={styles.tableRow}>
-                  <div style={{ flex: 2 }}>{credit.description}</div>
+                <div
+                  key={credit.id}
+                  style={{
+                    ...styles.tableRow,
+                    ...(credit.isInherited ? styles.inheritedTableRow : {}),
+                  }}
+                >
+                  <div style={{ flex: 2 }}>
+                    {credit.description}
+                    {credit.isInherited && (
+                      <span style={styles.inheritedBadge}> (Inherited from {credit.originalMonth})</span>
+                    )}
+                  </div>
                   <div style={{ flex: 1 }}>${credit.amount.toFixed(2)}</div>
                   <div style={{ flex: 1 }}>{formatAccountType(credit.accountType)}</div>
-                  <div style={{ flex: 1 }}>{credit.month}</div>
                   <div style={{ flex: 1, display: 'flex', gap: '8px' }}>
-                    <button onClick={() => handleCreditEdit(credit)} style={styles.editButton}>
-                      Edit
-                    </button>
-                    <button onClick={() => handleCreditDelete(credit.id)} style={styles.deleteButton}>
-                      Delete
-                    </button>
+                    {!credit.isInherited && (
+                      <>
+                        <button onClick={() => handleCreditEdit(credit)} style={styles.editButton}>
+                          Edit
+                        </button>
+                        <button onClick={() => handleCreditDelete(credit.id)} style={styles.deleteButton}>
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -382,8 +393,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   monthSelector: { marginBottom: '24px' },
   card: { backgroundColor: 'white', padding: '24px', borderRadius: '8px', marginBottom: '24px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
   cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' },
-  applyButton: { padding: '10px 20px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '500' },
+  applyButton: { padding: '10px 20px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '500', whiteSpace: 'nowrap' },
   inheritedNotice: { padding: '12px', backgroundColor: '#e8f4f8', border: '1px solid #bee5eb', borderRadius: '4px', marginBottom: '16px', fontSize: '14px', color: '#0c5460' },
+  inheritedGlobalNotice: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', padding: '16px', backgroundColor: '#e8f4f8', border: '1px solid #bee5eb', borderRadius: '8px', marginBottom: '24px', color: '#0c5460' },
   helper: { fontSize: '14px', color: '#666', margin: '4px 0 0 0' },
   form: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
   creditForm: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '20px', padding: '16px', backgroundColor: '#f8f9fa', borderRadius: '4px' },
@@ -399,6 +411,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   table: { border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' },
   tableHeader: { display: 'flex', padding: '12px', backgroundColor: '#f8f9fa', fontWeight: '500', borderBottom: '2px solid #ddd' },
   tableRow: { display: 'flex', padding: '12px', borderBottom: '1px solid #eee', alignItems: 'center' },
+  inheritedTableRow: { backgroundColor: '#f8f9fa', opacity: 0.85 },
 };
 
 export default IncomeManagement;

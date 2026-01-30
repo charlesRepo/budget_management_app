@@ -78,11 +78,12 @@ model Settings {
   authorizedEmails           String[] // List of authorized email addresses
   checkingBalance            Float    @default(0) // Current balance in checking account
   creditCardBalance          Float    @default(0) // Current balance in credit card (negative = owe money)
-  lineOfCreditBalance        Float    @default(0) // Current balance in line of credit (negative = owe money)
-  studentLineOfCreditBalance Float    @default(0) // Current balance in student line of credit (negative = owe money)
   travelSavings              Float    @default(1000) // Monthly travel savings goal
   homeSavings                Float    @default(500) // Monthly home savings goal
   generalSavings             Float    @default(1000) // Monthly general savings goal
+  travelSavingsAssignedTo    String   @default("shared") // "person1", "person2", or "shared"
+  homeSavingsAssignedTo      String   @default("shared") // "person1", "person2", or "shared"
+  generalSavingsAssignedTo   String   @default("shared") // "person1", "person2", or "shared"
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
 

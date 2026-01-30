@@ -47,4 +47,10 @@ export const incomeService = {
     const response = await api.post('/income/apply-inherited', { month });
     return response.data.income;
   },
+
+  // Apply both inherited income and credits from previous month to current month
+  async applyAllInherited(month: string): Promise<{ income: Income[]; credits: any[] }> {
+    const response = await api.post('/income/apply-all-inherited', { month });
+    return { income: response.data.income, credits: response.data.credits };
+  },
 };

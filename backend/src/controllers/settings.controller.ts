@@ -17,6 +17,9 @@ const updateSettingsSchema = z.object({
   travelSavings: z.number().min(0).optional(),
   homeSavings: z.number().min(0).optional(),
   generalSavings: z.number().min(0).optional(),
+  travelSavingsAssignedTo: z.enum(['person1', 'person2', 'shared']).optional(),
+  homeSavingsAssignedTo: z.enum(['person1', 'person2', 'shared']).optional(),
+  generalSavingsAssignedTo: z.enum(['person1', 'person2', 'shared']).optional(),
 }).refine(
   (data) => {
     // If both ratios are provided, they must sum to 100

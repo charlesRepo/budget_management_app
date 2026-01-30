@@ -13,6 +13,9 @@ router.get('/summary/:month', incomeController.getMonthSummary);
 // POST /api/income/apply-inherited - Apply inherited income from previous month (must be before /:id)
 router.post('/apply-inherited', incomeController.applyInheritedIncome);
 
+// POST /api/income/apply-all-inherited - Apply both inherited income and credits from previous month
+router.post('/apply-all-inherited', incomeController.applyAllInherited);
+
 // GET /api/income - Get all income records
 router.get('/', incomeController.getIncome);
 

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { incomeService } from '../services/income.service';
+import { accountCreditService } from '../services/accountCredit.service';
 import { z } from 'zod';
 
 // Validation schemas
@@ -146,6 +147,33 @@ export const incomeController = {
     } catch (error) {
       console.error('Apply inherited income error:', error);
       res.status(500).json({ error: 'Failed to apply inherited income' });
+    }
+  },
+
+  // POST /api/income/apply-all-inherited
+  async applyAllInherited(req: Request, res: Response) {
+    try {
+      const userId = req.user!.id;
+      const { month } = req.body;
+
+      if (!month || !/^\d{4}-\d{2}$/.test(month)) {
+        return res.status(400).json({ error: 'Valid month (YYYY-MM) is required' });
+      }
+
+      // Apply both income and credits in parallel
+      const [incomes, credits] = await Promise.all([
+        incomeService.applyInheritedIncome(userId, month),
+        accountCreditService.applyInheritedCredits(userId, month),
+      ]);
+
+      res.status(201).json({
+        message: 'Inherited income and credits applied successfully',
+        income: incomes,
+        credits: credits,
+      });
+    } catch (error) {
+      console.error('Apply all inherited error:', error);
+      res.status(500).json({ error: 'Failed to apply inherited data' });
     }
   },
 };

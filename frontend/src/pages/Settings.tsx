@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { settingsService } from '../services/settings';
 import type { UpdateSettingsInput } from '../types';
 
 const Settings: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<UpdateSettingsInput>({});
@@ -23,11 +27,12 @@ const Settings: React.FC = () => {
         person2Name: data.person2Name,
         checkingBalance: data.checkingBalance,
         creditCardBalance: data.creditCardBalance,
-        lineOfCreditBalance: data.lineOfCreditBalance,
-        studentLineOfCreditBalance: data.studentLineOfCreditBalance,
         travelSavings: data.travelSavings,
         homeSavings: data.homeSavings,
         generalSavings: data.generalSavings,
+        travelSavingsAssignedTo: data.travelSavingsAssignedTo,
+        homeSavingsAssignedTo: data.homeSavingsAssignedTo,
+        generalSavingsAssignedTo: data.generalSavingsAssignedTo,
       });
     } catch (error) {
       console.error('Failed to fetch settings:', error);
@@ -63,6 +68,13 @@ const Settings: React.FC = () => {
     }
   };
 
+  const handleLogout = async () => {
+    if (confirm('Are you sure you want to logout?')) {
+      await logout();
+      navigate('/login');
+    }
+  };
+
   if (loading) {
     return <div style={styles.loading}>Loading...</div>;
   }
@@ -70,6 +82,19 @@ const Settings: React.FC = () => {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Settings</h1>
+
+      <div style={styles.card}>
+        <h2 style={styles.sectionTitle}>Account</h2>
+        <div style={styles.accountInfo}>
+          <div>
+            <div style={styles.accountLabel}>Logged in as:</div>
+            <div style={styles.accountValue}>{user?.name || user?.email}</div>
+          </div>
+          <button onClick={handleLogout} style={styles.logoutButton} type="button">
+            Logout
+          </button>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit}>
         <div style={styles.card}>
@@ -187,84 +212,115 @@ const Settings: React.FC = () => {
               />
               <span style={styles.helperSmall}>Use negative value if you owe money</span>
             </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Personal Line of Credit Balance ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.lineOfCreditBalance || ''}
-                onChange={(e) => setFormData({ ...formData, lineOfCreditBalance: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="0.00"
-              />
-              <span style={styles.helperSmall}>Use negative value for debt</span>
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Student Line of Credit Balance ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.studentLineOfCreditBalance || ''}
-                onChange={(e) => setFormData({ ...formData, studentLineOfCreditBalance: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="0.00"
-              />
-              <span style={styles.helperSmall}>Use negative value for debt</span>
-            </div>
           </div>
         </div>
 
         <div style={styles.card}>
           <h2 style={styles.sectionTitle}>Monthly Savings Goals</h2>
-          <p style={styles.helper}>Set monthly savings targets (split between partners based on ratio)</p>
+          <p style={styles.helper}>Set monthly savings targets and assign them to individuals or split between partners</p>
 
-          <div style={styles.balancesGrid}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Travel Savings ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.travelSavings || ''}
-                onChange={(e) => setFormData({ ...formData, travelSavings: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="1000.00"
-              />
-              <span style={styles.helperSmall}>Monthly savings for travel</span>
+          <div style={styles.savingsItemsContainer}>
+            {/* Travel Savings */}
+            <div style={styles.savingsItem}>
+              <div style={styles.savingsItemHeader}>
+                <label style={styles.label}>Travel Savings</label>
+              </div>
+              <div style={styles.savingsItemFields}>
+                <div style={styles.formGroup}>
+                  <label style={styles.labelSmall}>Amount ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.travelSavings || ''}
+                    onChange={(e) => setFormData({ ...formData, travelSavings: parseFloat(e.target.value) || 0 })}
+                    style={styles.input}
+                    placeholder="1000.00"
+                  />
+                </div>
+                <div style={styles.formGroup}>
+                  <label style={styles.labelSmall}>Assigned To</label>
+                  <select
+                    value={formData.travelSavingsAssignedTo || 'shared'}
+                    onChange={(e) => setFormData({ ...formData, travelSavingsAssignedTo: e.target.value as any })}
+                    style={styles.select}
+                  >
+                    <option value="shared">Shared (split by ratio)</option>
+                    <option value="person1">{formData.person1Name || 'Person 1'} only</option>
+                    <option value="person2">{formData.person2Name || 'Person 2'} only</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Home Savings ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.homeSavings || ''}
-                onChange={(e) => setFormData({ ...formData, homeSavings: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="500.00"
-              />
-              <span style={styles.helperSmall}>Monthly savings for home expenses</span>
+            {/* Home Savings */}
+            <div style={styles.savingsItem}>
+              <div style={styles.savingsItemHeader}>
+                <label style={styles.label}>Home Savings</label>
+              </div>
+              <div style={styles.savingsItemFields}>
+                <div style={styles.formGroup}>
+                  <label style={styles.labelSmall}>Amount ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.homeSavings || ''}
+                    onChange={(e) => setFormData({ ...formData, homeSavings: parseFloat(e.target.value) || 0 })}
+                    style={styles.input}
+                    placeholder="500.00"
+                  />
+                </div>
+                <div style={styles.formGroup}>
+                  <label style={styles.labelSmall}>Assigned To</label>
+                  <select
+                    value={formData.homeSavingsAssignedTo || 'shared'}
+                    onChange={(e) => setFormData({ ...formData, homeSavingsAssignedTo: e.target.value as any })}
+                    style={styles.select}
+                  >
+                    <option value="shared">Shared (split by ratio)</option>
+                    <option value="person1">{formData.person1Name || 'Person 1'} only</option>
+                    <option value="person2">{formData.person2Name || 'Person 2'} only</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>General Savings ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.generalSavings || ''}
-                onChange={(e) => setFormData({ ...formData, generalSavings: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="1000.00"
-              />
-              <span style={styles.helperSmall}>Monthly general savings</span>
+            {/* General Savings */}
+            <div style={styles.savingsItem}>
+              <div style={styles.savingsItemHeader}>
+                <label style={styles.label}>General Savings</label>
+              </div>
+              <div style={styles.savingsItemFields}>
+                <div style={styles.formGroup}>
+                  <label style={styles.labelSmall}>Amount ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.generalSavings || ''}
+                    onChange={(e) => setFormData({ ...formData, generalSavings: parseFloat(e.target.value) || 0 })}
+                    style={styles.input}
+                    placeholder="1000.00"
+                  />
+                </div>
+                <div style={styles.formGroup}>
+                  <label style={styles.labelSmall}>Assigned To</label>
+                  <select
+                    value={formData.generalSavingsAssignedTo || 'shared'}
+                    onChange={(e) => setFormData({ ...formData, generalSavingsAssignedTo: e.target.value as any })}
+                    style={styles.select}
+                  >
+                    <option value="shared">Shared (split by ratio)</option>
+                    <option value="person1">{formData.person1Name || 'Person 1'} only</option>
+                    <option value="person2">{formData.person2Name || 'Person 2'} only</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div style={{ marginTop: '16px', fontSize: '14px', fontWeight: '500' }}>
+          <div style={{ marginTop: '20px', fontSize: '14px', fontWeight: '500', padding: '12px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
             Total Monthly Savings: ${((formData.travelSavings || 0) + (formData.homeSavings || 0) + (formData.generalSavings || 0)).toFixed(2)}
           </div>
         </div>
@@ -294,12 +350,41 @@ const styles: { [key: string]: React.CSSProperties } = {
   helper: { fontSize: '14px', color: '#666', marginBottom: '16px' },
   formGroup: { marginBottom: '20px' },
   label: { display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '6px' },
+  labelSmall: { display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '6px', color: '#555' },
   input: {
     width: '100%',
     padding: '10px',
     border: '1px solid #ddd',
     borderRadius: '4px',
     boxSizing: 'border-box',
+  },
+  select: {
+    width: '100%',
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+  },
+  savingsItemsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  savingsItem: {
+    padding: '16px',
+    backgroundColor: '#f9f9f9',
+    borderRadius: '6px',
+    border: '1px solid #e0e0e0',
+  },
+  savingsItemHeader: {
+    marginBottom: '12px',
+  },
+  savingsItemFields: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '12px',
   },
   ratioContainer: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' },
   balancesGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' },
@@ -316,6 +401,33 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
+  },
+  accountInfo: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '16px',
+    flexWrap: 'wrap',
+  },
+  accountLabel: {
+    fontSize: '12px',
+    color: '#999',
+    marginBottom: '4px',
+  },
+  accountValue: {
+    fontSize: '14px',
+    color: '#333',
+    fontWeight: '500',
+  },
+  logoutButton: {
+    padding: '10px 20px',
+    fontSize: '14px',
+    color: '#e74c3c',
+    backgroundColor: 'white',
+    border: '1px solid #e74c3c',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
   },
 };
 

@@ -7,12 +7,16 @@ const Dashboard: React.FC = () => {
   const [calculations, setCalculations] = useState<MonthlyCalculation | null>(null);
   const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState(
-    new Date().toISOString().slice(0, 7) // YYYY-MM
-  );
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    // Try to load from localStorage, fallback to current month
+    const saved = localStorage.getItem('selectedMonth');
+    return saved || new Date().toISOString().slice(0, 7);
+  });
 
   useEffect(() => {
     fetchData();
+    // Save selected month to localStorage
+    localStorage.setItem('selectedMonth', selectedMonth);
   }, [selectedMonth]);
 
   const fetchData = async () => {
@@ -200,8 +204,6 @@ const Dashboard: React.FC = () => {
       <div style={styles.accountsGrid}>
         {renderAccountCard('Checking Account', calculations.checking, 'blue', true)}
         {renderAccountCard('Credit Card', calculations.creditCard, 'orange', true)}
-        {renderAccountCard('Personal Line of Credit', calculations.lineOfCredit, 'red', false)}
-        {renderAccountCard('Student Line of Credit', calculations.studentLineOfCredit, 'purple', false)}
       </div>
 
       {/* Savings Section */}
@@ -218,36 +220,40 @@ const Dashboard: React.FC = () => {
               <div style={styles.savingsCategory}>
                 <h3 style={styles.categoryTitle}>Travel Savings: ${calculations.savings.travelGoal.toFixed(2)}</h3>
                 <div style={styles.categoryBreakdown}>
-                  <div style={styles.categoryPerson}>
-                    <div style={styles.categoryPersonHeader}>{person1Name}</div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 1:</span>
-                      <span>${calculations.savings.person1.travel.part1.toFixed(2)}</span>
+                  {calculations.savings.person1.travel.total > 0 && (
+                    <div style={styles.categoryPerson}>
+                      <div style={styles.categoryPersonHeader}>{person1Name}</div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 1:</span>
+                        <span>${calculations.savings.person1.travel.part1.toFixed(2)}</span>
+                      </div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 2:</span>
+                        <span>${calculations.savings.person1.travel.part2.toFixed(2)}</span>
+                      </div>
+                      <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${calculations.savings.person1.travel.total.toFixed(2)}</strong></span>
+                      </div>
                     </div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 2:</span>
-                      <span>${calculations.savings.person1.travel.part2.toFixed(2)}</span>
+                  )}
+                  {calculations.savings.person2.travel.total > 0 && (
+                    <div style={styles.categoryPerson}>
+                      <div style={styles.categoryPersonHeader}>{person2Name}</div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 1:</span>
+                        <span>${calculations.savings.person2.travel.part1.toFixed(2)}</span>
+                      </div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 2:</span>
+                        <span>${calculations.savings.person2.travel.part2.toFixed(2)}</span>
+                      </div>
+                      <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${calculations.savings.person2.travel.total.toFixed(2)}</strong></span>
+                      </div>
                     </div>
-                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
-                      <span><strong>Total:</strong></span>
-                      <span><strong>${calculations.savings.person1.travel.total.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
-                  <div style={styles.categoryPerson}>
-                    <div style={styles.categoryPersonHeader}>{person2Name}</div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 1:</span>
-                      <span>${calculations.savings.person2.travel.part1.toFixed(2)}</span>
-                    </div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 2:</span>
-                      <span>${calculations.savings.person2.travel.part2.toFixed(2)}</span>
-                    </div>
-                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
-                      <span><strong>Total:</strong></span>
-                      <span><strong>${calculations.savings.person2.travel.total.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -257,36 +263,40 @@ const Dashboard: React.FC = () => {
               <div style={styles.savingsCategory}>
                 <h3 style={styles.categoryTitle}>Home Savings: ${calculations.savings.homeGoal.toFixed(2)}</h3>
                 <div style={styles.categoryBreakdown}>
-                  <div style={styles.categoryPerson}>
-                    <div style={styles.categoryPersonHeader}>{person1Name}</div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 1:</span>
-                      <span>${calculations.savings.person1.home.part1.toFixed(2)}</span>
+                  {calculations.savings.person1.home.total > 0 && (
+                    <div style={styles.categoryPerson}>
+                      <div style={styles.categoryPersonHeader}>{person1Name}</div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 1:</span>
+                        <span>${calculations.savings.person1.home.part1.toFixed(2)}</span>
+                      </div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 2:</span>
+                        <span>${calculations.savings.person1.home.part2.toFixed(2)}</span>
+                      </div>
+                      <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${calculations.savings.person1.home.total.toFixed(2)}</strong></span>
+                      </div>
                     </div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 2:</span>
-                      <span>${calculations.savings.person1.home.part2.toFixed(2)}</span>
+                  )}
+                  {calculations.savings.person2.home.total > 0 && (
+                    <div style={styles.categoryPerson}>
+                      <div style={styles.categoryPersonHeader}>{person2Name}</div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 1:</span>
+                        <span>${calculations.savings.person2.home.part1.toFixed(2)}</span>
+                      </div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 2:</span>
+                        <span>${calculations.savings.person2.home.part2.toFixed(2)}</span>
+                      </div>
+                      <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${calculations.savings.person2.home.total.toFixed(2)}</strong></span>
+                      </div>
                     </div>
-                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
-                      <span><strong>Total:</strong></span>
-                      <span><strong>${calculations.savings.person1.home.total.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
-                  <div style={styles.categoryPerson}>
-                    <div style={styles.categoryPersonHeader}>{person2Name}</div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 1:</span>
-                      <span>${calculations.savings.person2.home.part1.toFixed(2)}</span>
-                    </div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 2:</span>
-                      <span>${calculations.savings.person2.home.part2.toFixed(2)}</span>
-                    </div>
-                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
-                      <span><strong>Total:</strong></span>
-                      <span><strong>${calculations.savings.person2.home.total.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -296,36 +306,40 @@ const Dashboard: React.FC = () => {
               <div style={styles.savingsCategory}>
                 <h3 style={styles.categoryTitle}>General Savings: ${calculations.savings.generalGoal.toFixed(2)}</h3>
                 <div style={styles.categoryBreakdown}>
-                  <div style={styles.categoryPerson}>
-                    <div style={styles.categoryPersonHeader}>{person1Name}</div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 1:</span>
-                      <span>${calculations.savings.person1.general.part1.toFixed(2)}</span>
+                  {calculations.savings.person1.general.total > 0 && (
+                    <div style={styles.categoryPerson}>
+                      <div style={styles.categoryPersonHeader}>{person1Name}</div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 1:</span>
+                        <span>${calculations.savings.person1.general.part1.toFixed(2)}</span>
+                      </div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 2:</span>
+                        <span>${calculations.savings.person1.general.part2.toFixed(2)}</span>
+                      </div>
+                      <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${calculations.savings.person1.general.total.toFixed(2)}</strong></span>
+                      </div>
                     </div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 2:</span>
-                      <span>${calculations.savings.person1.general.part2.toFixed(2)}</span>
+                  )}
+                  {calculations.savings.person2.general.total > 0 && (
+                    <div style={styles.categoryPerson}>
+                      <div style={styles.categoryPersonHeader}>{person2Name}</div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 1:</span>
+                        <span>${calculations.savings.person2.general.part1.toFixed(2)}</span>
+                      </div>
+                      <div style={styles.categoryItem}>
+                        <span>Part 2:</span>
+                        <span>${calculations.savings.person2.general.part2.toFixed(2)}</span>
+                      </div>
+                      <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
+                        <span><strong>Total:</strong></span>
+                        <span><strong>${calculations.savings.person2.general.total.toFixed(2)}</strong></span>
+                      </div>
                     </div>
-                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
-                      <span><strong>Total:</strong></span>
-                      <span><strong>${calculations.savings.person1.general.total.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
-                  <div style={styles.categoryPerson}>
-                    <div style={styles.categoryPersonHeader}>{person2Name}</div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 1:</span>
-                      <span>${calculations.savings.person2.general.part1.toFixed(2)}</span>
-                    </div>
-                    <div style={styles.categoryItem}>
-                      <span>Part 2:</span>
-                      <span>${calculations.savings.person2.general.part2.toFixed(2)}</span>
-                    </div>
-                    <div style={{ ...styles.categoryItem, ...styles.categoryTotal }}>
-                      <span><strong>Total:</strong></span>
-                      <span><strong>${calculations.savings.person2.general.total.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}

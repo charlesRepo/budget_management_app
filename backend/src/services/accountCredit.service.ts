@@ -1,5 +1,17 @@
 import prisma from '../config/prisma';
 
+// Helper function to get previous month in YYYY-MM format
+function getPreviousMonth(month: string): string {
+  const [year, monthNum] = month.split('-').map(Number);
+  const date = new Date(year, monthNum - 1, 1);
+  date.setMonth(date.getMonth() - 1);
+
+  const prevYear = date.getFullYear();
+  const prevMonth = String(date.getMonth() + 1).padStart(2, '0');
+
+  return `${prevYear}-${prevMonth}`;
+}
+
 export interface CreateAccountCreditInput {
   description: string;
   amount: number;
@@ -15,17 +27,39 @@ export interface UpdateAccountCreditInput {
 }
 
 export const accountCreditService = {
-  // Get all account credits for a user (optionally filtered by month)
+  // Get all account credits for a user (optionally filtered by month), with inheritance from previous month
   async getAccountCredits(userId: string, month?: string) {
     const where: any = { userId };
     if (month) {
       where.month = month;
     }
 
-    return await prisma.accountCredit.findMany({
+    const credits = await prisma.accountCredit.findMany({
       where,
       orderBy: [{ month: 'desc' }, { createdAt: 'desc' }],
     });
+
+    // If a specific month is requested and no records exist, fetch previous month
+    if (month && credits.length === 0) {
+      const previousMonth = getPreviousMonth(month);
+      const previousCredits = await prisma.accountCredit.findMany({
+        where: {
+          userId,
+          month: previousMonth,
+        },
+        orderBy: [{ createdAt: 'desc' }],
+      });
+
+      // Mark these as inherited and update the month reference
+      return previousCredits.map(record => ({
+        ...record,
+        isInherited: true,
+        originalMonth: record.month,
+        month: month, // Set to requested month for display
+      }));
+    }
+
+    return credits.map(record => ({ ...record, isInherited: false }));
   },
 
   // Get a specific account credit
@@ -101,5 +135,39 @@ export const accountCreditService = {
         .filter(c => c.accountType === 'student_line_of_credit')
         .reduce((sum, c) => sum + c.amount, 0),
     };
+  },
+
+  // Apply inherited account credits from previous month to current month
+  async applyInheritedCredits(userId: string, month: string) {
+    const previousMonth = getPreviousMonth(month);
+
+    // Get previous month's credits
+    const previousCredits = await prisma.accountCredit.findMany({
+      where: {
+        userId,
+        month: previousMonth,
+      },
+    });
+
+    if (previousCredits.length === 0) {
+      return [];
+    }
+
+    // Create new records for the current month
+    const newCredits = await Promise.all(
+      previousCredits.map(record =>
+        prisma.accountCredit.create({
+          data: {
+            userId,
+            description: record.description,
+            amount: record.amount,
+            accountType: record.accountType,
+            month: month,
+          },
+        })
+      )
+    );
+
+    return newCredits;
   },
 };
