@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
+import { colors, spacing, borderRadius, shadows } from '../styles/theme';
 
 const AuthCallback: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -67,46 +68,46 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
   card: {
-    backgroundColor: 'white',
-    padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+    backgroundColor: colors.white,
+    padding: spacing.xxxl,
+    borderRadius: borderRadius.md,
+    boxShadow: shadows.lg,
     maxWidth: '400px',
     width: '100%',
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
   spinner: {
     width: '40px',
     height: '40px',
-    margin: '0 auto 20px',
-    border: '4px solid #f3f3f3',
-    borderTop: '4px solid #3498db',
+    margin: `0 auto ${spacing.xl}`,
+    border: `4px solid ${colors.background}`,
+    borderTop: `4px solid ${colors.primary}`,
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
   },
   errorIcon: {
     fontSize: '48px',
-    color: '#e74c3c',
-    marginBottom: '20px',
+    color: colors.error,
+    marginBottom: spacing.xl,
   },
   title: {
     fontSize: '20px',
-    fontWeight: 'bold',
-    marginBottom: '12px',
-    color: '#333',
+    fontWeight: 'bold' as const,
+    marginBottom: spacing.md,
+    color: colors.text,
   },
   message: {
     fontSize: '14px',
-    color: '#666',
+    color: colors.textLight,
     lineHeight: '1.5',
   },
   redirect: {
     fontSize: '12px',
-    color: '#999',
-    marginTop: '16px',
+    color: colors.textMuted,
+    marginTop: spacing.lg,
   },
 };
 
