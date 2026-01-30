@@ -228,8 +228,6 @@ const ExpenseForm: React.FC = () => {
           >
             <option value="checking">Checking Account</option>
             <option value="credit_card">Credit Card</option>
-            <option value="line_of_credit">Personal Line of Credit</option>
-            <option value="student_line_of_credit">Student Line of Credit</option>
           </select>
         </div>
 

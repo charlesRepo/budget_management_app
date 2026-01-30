@@ -7,14 +7,8 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
 
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -23,14 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-          <h1 style={styles.logo} onClick={() => navigate('/')}>CRH Budget Management App</h1>
-
-          <div style={styles.userSection}>
-              <span style={styles.userName}>{user?.name || user?.email}</span>
-              <button onClick={handleLogout} style={styles.logoutButton}>
-                  Logout
-              </button>
-          </div>
+        <h1 style={styles.logo} onClick={() => navigate('/')}>CRH Budget Management App</h1>
 
         <div style={styles.headerContent}>
           <div style={styles.leftSection}>
@@ -90,6 +77,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: 'white',
     borderBottom: '1px solid #e5e5e5',
     padding: '0 20px',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
   },
   headerContent: {
     maxWidth: '1200px',
@@ -132,27 +122,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#f0f0f0',
     color: '#333',
     fontWeight: '500',
-  },
-  userSection: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '16px',
-    gap: '16px',
-  },
-  userName: {
-    fontSize: '14px',
-    color: '#666',
-  },
-  logoutButton: {
-    padding: '8px 16px',
-    fontSize: '14px',
-    color: '#666',
-    backgroundColor: 'white',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
   },
   main: {
     minHeight: 'calc(100vh - 64px)',
