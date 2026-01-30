@@ -39,8 +39,9 @@ const Dashboard: React.FC = () => {
 
   const copyToClipboard = async (amount: number, id: string) => {
     try {
-      // Copy only the number without dollar sign
-      await navigator.clipboard.writeText(amount.toFixed(2));
+      // Round up to nearest whole dollar and copy without dollar sign
+      const roundedAmount = Math.ceil(amount);
+      await navigator.clipboard.writeText(roundedAmount.toString());
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (error) {
@@ -70,6 +71,7 @@ const Dashboard: React.FC = () => {
 
   const renderCopyButton = (amount: number, label: string, id: string) => {
     const isCopied = copiedId === id;
+    const roundedAmount = Math.ceil(amount);
     return (
       <button
         onClick={() => copyToClipboard(amount, id)}
@@ -80,7 +82,7 @@ const Dashboard: React.FC = () => {
       >
         <div style={styles.copyButtonContent}>
           <span style={styles.copyLabel}>{label}</span>
-          <span style={styles.copyAmount}>${amount.toFixed(2)}</span>
+          <span style={styles.copyAmount}>${roundedAmount}</span>
         </div>
         <span style={styles.copyIcon}>{isCopied ? '✓' : '📋'}</span>
       </button>
