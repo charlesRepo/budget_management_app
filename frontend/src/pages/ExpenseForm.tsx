@@ -327,12 +327,7 @@ const ExpenseForm: React.FC = () => {
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    padding: spacing.lg,
-    maxWidth: '800px',
-    margin: '0 auto',
-    paddingBottom: '80px',
-  },
+  container: { ...pageContainer },
   loadingContainer: {
     display: 'flex',
     flexDirection: 'column',
