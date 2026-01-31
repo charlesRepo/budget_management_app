@@ -108,3 +108,12 @@ model AccountCredit {
   @@index([accountType])
 }
 
+// Session model - stores express session data
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

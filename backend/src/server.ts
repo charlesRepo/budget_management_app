@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import session from 'express-session';
+import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import path from 'path';
 import passport from './config/passport';
+import prisma from './config/prisma';
 import authRoutes from './routes/auth';
 import expenseRoutes from './routes/expenses';
 import incomeRoutes from './routes/income';
@@ -24,6 +26,11 @@ app.use(
     secret: process.env.SESSION_SECRET || 'your-session-secret',
     resave: false,
     saveUninitialized: false,
+    store: new PrismaSessionStore(prisma, {
+      checkPeriod: 2 * 60 * 1000, // Clean up expired sessions every 2 minutes
+      dbRecordIdIsSessionId: true,
+      dbRecordIdFunction: undefined,
+    }),
     cookie: {
       secure: process.env.NODE_ENV === 'production', // Only use secure cookies in production
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
