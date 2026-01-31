@@ -164,8 +164,8 @@ const IncomeManagement: React.FC = () => {
 
   const formatAccountType = (accountType: AccountType): string => {
     const typeMap: Record<AccountType, string> = {
-      checking: 'Checking',
-      credit_card: 'Credit Card',
+      checking: 'CHK',
+      credit_card: 'CC',
     };
     return typeMap[accountType] || accountType;
   };
@@ -341,10 +341,10 @@ const IncomeManagement: React.FC = () => {
           <>
             <div style={styles.table}>
               <div style={styles.tableHeader}>
-                <div style={{ flex: 2 }}>Description</div>
-                <div style={{ flex: 1 }}>Amount</div>
-                <div style={{ flex: 1 }}>Account</div>
-                <div style={{ flex: 1 }}>Actions</div>
+                <div style={{ flex: 3 }}>Description</div>
+                <div style={{ flex: 1.5 }}>Amount</div>
+                <div style={{ flex: 1.5 }}>Account</div>
+                <div style={{ flex: 1, textAlign: 'center' }}>Actions</div>
               </div>
               {credits.map((credit) => (
                 <div
@@ -354,15 +354,15 @@ const IncomeManagement: React.FC = () => {
                     ...(credit.isInherited ? styles.inheritedTableRow : {}),
                   }}
                 >
-                  <div style={{ flex: 2 }}>
+                  <div style={{ flex: 3 }}>
                     {credit.description}
                     {credit.isInherited && (
                       <span style={styles.inheritedBadge}> (Inherited from {credit.originalMonth})</span>
                     )}
                   </div>
-                  <div style={{ flex: 1 }}>${credit.amount.toFixed(2)}</div>
-                  <div style={{ flex: 1 }}>{formatAccountType(credit.accountType)}</div>
-                  <div style={{ flex: 1, display: 'flex', gap: '8px' }}>
+                  <div style={{ flex: 1.5 }}>${credit.amount.toFixed(2)}</div>
+                  <div style={{ flex: 1.5 }}>{formatAccountType(credit.accountType)}</div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
                     {!credit.isInherited && (
                       <>
                         <button onClick={() => handleCreditEdit(credit)} style={styles.editButton}>
@@ -457,6 +457,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: 'pointer',
     fontSize: '12px',
     fontWeight: '600',
+    minWidth: '70px',
+    whiteSpace: 'nowrap',
   },
   incomeItem: {
     display: 'flex',
@@ -476,6 +478,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: 'pointer',
     fontSize: '12px',
     fontWeight: '600',
+    minWidth: '70px',
+    whiteSpace: 'nowrap',
   },
   total: { marginTop: spacing.lg, fontSize: '18px', textAlign: 'right', fontWeight: '600' },
   table: {

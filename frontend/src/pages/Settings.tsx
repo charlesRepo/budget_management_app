@@ -185,38 +185,6 @@ const Settings: React.FC = () => {
         </div>
 
         <div style={styles.card}>
-          <h2 style={styles.sectionTitle}>Account Balances</h2>
-          <p style={styles.helper}>Enter current balances for accurate calculations (negative for debt)</p>
-
-          <div style={styles.balancesGrid}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Checking Balance ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.checkingBalance || ''}
-                onChange={(e) => setFormData({ ...formData, checkingBalance: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="0.00"
-              />
-            </div>
-
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Credit Card Balance ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.creditCardBalance || ''}
-                onChange={(e) => setFormData({ ...formData, creditCardBalance: parseFloat(e.target.value) || 0 })}
-                style={styles.input}
-                placeholder="0.00"
-              />
-              <span style={styles.helperSmall}>Use negative value if you owe money</span>
-            </div>
-          </div>
-        </div>
-
-        <div style={styles.card}>
           <h2 style={styles.sectionTitle}>Monthly Savings Goals</h2>
           <p style={styles.helper}>Set monthly savings targets and assign them to individuals or split between partners</p>
 
@@ -375,7 +343,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: spacing.md,
   },
   ratioContainer: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.lg },
-  balancesGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: spacing.lg },
   helperSmall: { ...commonStyles.helperText },
   totalRatio: { marginTop: spacing.lg, fontSize: '16px', fontWeight: '500' },
   errorText: { color: colors.error },

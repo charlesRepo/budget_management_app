@@ -11,8 +11,14 @@ const Dashboard: React.FC = () => {
     const saved = localStorage.getItem('selectedMonth');
     return saved || new Date().toISOString().slice(0, 7);
   });
-  const [selectedPart, setSelectedPart] = useState<'part1' | 'part2'>('part1');
-  const [selectedPerson, setSelectedPerson] = useState<'all' | 'person1' | 'person2'>('all');
+  const [selectedPart, setSelectedPart] = useState<'part1' | 'part2'>(() => {
+    const saved = localStorage.getItem('selectedPart');
+    return (saved as 'part1' | 'part2') || 'part1';
+  });
+  const [selectedPerson, setSelectedPerson] = useState<'all' | 'person1' | 'person2'>(() => {
+    const saved = localStorage.getItem('selectedPerson');
+    return (saved as 'all' | 'person1' | 'person2') || 'all';
+  });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -20,6 +26,14 @@ const Dashboard: React.FC = () => {
     fetchData();
     localStorage.setItem('selectedMonth', selectedMonth);
   }, [selectedMonth]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedPart', selectedPart);
+  }, [selectedPart]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedPerson', selectedPerson);
+  }, [selectedPerson]);
 
   const fetchData = async () => {
     try {
@@ -156,7 +170,7 @@ const Dashboard: React.FC = () => {
 
       {/* Transfers Section */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>💸 Transfers Needed</h2>
+        <h2 style={styles.sectionTitle}>Transfers Needed</h2>
 
         {/* Checking Account */}
         <div style={styles.accountCard}>
@@ -257,7 +271,7 @@ const Dashboard: React.FC = () => {
 
       {/* Remaining Amounts */}
       <div style={styles.section}>
-        <h2 style={styles.sectionTitle}>💰 Remaining (Personal Money)</h2>
+        <h2 style={styles.sectionTitle}>Remaining (Personal Money)</h2>
         <div style={styles.remainingGrid}>
           {shouldShowPerson('person1') && (
             <div style={styles.remainingCard}>
@@ -446,12 +460,14 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   monthInput: {
     width: '100%',
+    maxWidth: '100%',
     padding: '12px',
     fontSize: '16px',
     border: '2px solid #ddd',
     borderRadius: '8px',
     backgroundColor: 'white',
     fontWeight: '500',
+    boxSizing: 'border-box',
   },
   partSelector: {
     display: 'grid',

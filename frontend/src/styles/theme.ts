@@ -46,6 +46,7 @@ export const shadows = {
 export const commonStyles = {
   input: {
     width: '100%',
+    maxWidth: '100%',
     padding: spacing.md,
     fontSize: '16px',
     border: `2px solid ${colors.border}`,

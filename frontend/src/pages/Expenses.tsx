@@ -11,6 +11,8 @@ const Expenses: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ExpenseFilters>({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [periodFilter, setPeriodFilter] = useState<string>('');
+  const [showStats, setShowStats] = useState(false);
 
   const fetchExpenses = async () => {
     try {
@@ -81,6 +83,62 @@ const Expenses: React.FC = () => {
     return activeMonths.map(monthNum => monthNames[monthNum - 1]).join(', ');
   };
 
+  // Get unique categories from all expenses
+  const uniqueCategories = Array.from(new Set(expenses.map(e => e.category))).sort();
+
+  // Filter expenses by period
+  const filterByPeriod = (expense: Expense) => {
+    if (!periodFilter) return true;
+
+    if (periodFilter === 'monthly') {
+      return expense.frequency === 'monthly';
+    }
+
+    if (periodFilter === 'yearly') {
+      return expense.frequency === 'yearly';
+    }
+
+    // Month-based filtering (e.g., "january" -> check if month 1 is in activeMonths)
+    const monthMap: { [key: string]: number } = {
+      'january': 1, 'february': 2, 'march': 3, 'april': 4,
+      'may': 5, 'june': 6, 'july': 7, 'august': 8,
+      'september': 9, 'october': 10, 'november': 11, 'december': 12
+    };
+
+    const monthNumber = monthMap[periodFilter.toLowerCase()];
+    if (monthNumber) {
+      return expense.activeMonths.includes(monthNumber);
+    }
+
+    return true;
+  };
+
+  const filteredExpenses = expenses.filter(filterByPeriod);
+
+  // Calculate stats for graphs
+  const categoryStats = expenses.reduce((acc, expense) => {
+    acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const monthStats = expenses.reduce((acc, expense) => {
+    expense.activeMonths.forEach(month => {
+      const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][month - 1];
+      acc[monthName] = (acc[monthName] || 0) + expense.amount;
+    });
+    return acc;
+  }, {} as Record<string, number>);
+
+  const accountStats = expenses.reduce((acc, expense) => {
+    const accountName = formatAccountType(expense.accountType);
+    acc[accountName] = (acc[accountName] || 0) + expense.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const maxCategoryAmount = Math.max(...Object.values(categoryStats));
+  const maxMonthAmount = Math.max(...Object.values(monthStats));
+  const maxAccountAmount = Math.max(...Object.values(accountStats));
+
   if (loading) {
     return (
       <div style={styles.loadingContainer}>
@@ -123,11 +181,9 @@ const Expenses: React.FC = () => {
             onChange={(e) => handleFilterChange('accountType', e.target.value)}
             style={styles.select}
           >
-            <option value="">All Accounts</option>
+            <option value="">Accounts</option>
             <option value="checking">Checking</option>
             <option value="credit_card">Credit Card</option>
-            <option value="line_of_credit">Personal Line of Credit</option>
-            <option value="student_line_of_credit">Student Line of Credit</option>
           </select>
 
           <select
@@ -135,30 +191,151 @@ const Expenses: React.FC = () => {
             onChange={(e) => handleFilterChange('paymentType', e.target.value)}
             style={styles.select}
           >
-            <option value="">All Payment Types</option>
+            <option value="">Payment Types</option>
             <option value="automatic">Automatic</option>
             <option value="manual">Manual</option>
           </select>
 
-          {Object.keys(filters).length > 0 && (
-            <button onClick={() => { setFilters({}); setSearchTerm(''); }} style={styles.clearButton}>
+          <select
+            value={filters.category || ''}
+            onChange={(e) => handleFilterChange('category', e.target.value)}
+            style={styles.select}
+          >
+            <option value="">Categories</option>
+            {uniqueCategories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+
+          <select
+            value={periodFilter}
+            onChange={(e) => setPeriodFilter(e.target.value)}
+            style={styles.select}
+          >
+            <option value="">Period</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+            <option value="january">January</option>
+            <option value="february">February</option>
+            <option value="march">March</option>
+            <option value="april">April</option>
+            <option value="may">May</option>
+            <option value="june">June</option>
+            <option value="july">July</option>
+            <option value="august">August</option>
+            <option value="september">September</option>
+            <option value="october">October</option>
+            <option value="november">November</option>
+            <option value="december">December</option>
+          </select>
+
+          {(Object.keys(filters).length > 0 || periodFilter) && (
+            <button onClick={() => { setFilters({}); setSearchTerm(''); setPeriodFilter(''); }} style={styles.clearFiltersButton}>
               Clear Filters
             </button>
           )}
         </div>
       </div>
 
+      {/* Stats Toggle */}
+      <button
+        onClick={() => setShowStats(!showStats)}
+        style={styles.statsToggle}
+      >
+        {showStats ? '▼' : '▶'} {showStats ? 'Hide' : 'Show'} Stats
+      </button>
+
+      {/* Stats Section */}
+      {showStats && (
+        <div style={styles.statsSection}>
+          {/* Category Stats */}
+          <div style={styles.statsCard}>
+            <h3 style={styles.statsTitle}>Expenses by Category</h3>
+            <div style={styles.chartContainer}>
+              {Object.entries(categoryStats)
+                .sort(([, a], [, b]) => b - a)
+                .map(([category, amount]) => (
+                  <div key={category} style={styles.chartRow}>
+                    <div style={styles.chartLabel}>{category}</div>
+                    <div style={styles.chartBarContainer}>
+                      <div
+                        style={{
+                          ...styles.chartBar,
+                          width: `${(amount / maxCategoryAmount) * 100}%`,
+                        }}
+                      />
+                      <span style={styles.chartValue}>{formatCurrency(amount)}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Month Stats */}
+          <div style={styles.statsCard}>
+            <h3 style={styles.statsTitle}>Expenses by Month</h3>
+            <div style={styles.chartContainer}>
+              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                .map(month => ({
+                  month,
+                  amount: monthStats[month] || 0,
+                }))
+                .filter(({ amount }) => amount > 0)
+                .map(({ month, amount }) => (
+                  <div key={month} style={styles.chartRow}>
+                    <div style={styles.chartLabel}>{month}</div>
+                    <div style={styles.chartBarContainer}>
+                      <div
+                        style={{
+                          ...styles.chartBar,
+                          width: `${(amount / maxMonthAmount) * 100}%`,
+                        }}
+                      />
+                      <span style={styles.chartValue}>{formatCurrency(amount)}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Account Stats */}
+          <div style={styles.statsCard}>
+            <h3 style={styles.statsTitle}>Expenses by Account</h3>
+            <div style={styles.chartContainer}>
+              {Object.entries(accountStats)
+                .sort(([, a], [, b]) => b - a)
+                .map(([account, amount]) => (
+                  <div key={account} style={styles.chartRow}>
+                    <div style={styles.chartLabel}>{account}</div>
+                    <div style={styles.chartBarContainer}>
+                      <div
+                        style={{
+                          ...styles.chartBar,
+                          width: `${(amount / maxAccountAmount) * 100}%`,
+                        }}
+                      />
+                      <span style={styles.chartValue}>{formatCurrency(amount)}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Expenses List */}
-      {expenses.length === 0 ? (
+      {filteredExpenses.length === 0 ? (
         <div style={styles.emptyState}>
           <p style={styles.emptyText}>No expenses found.</p>
-          <button onClick={() => navigate('/expenses/new')} style={styles.emptyButton}>
-            Add Your First Expense
-          </button>
+          {expenses.length === 0 && (
+            <button onClick={() => navigate('/expenses/new')} style={styles.emptyButton}>
+              Add Your First Expense
+            </button>
+          )}
         </div>
       ) : (
         <div style={styles.expensesList}>
-          {expenses.map((expense) => (
+          {filteredExpenses.map((expense) => (
             <div key={expense.id} style={styles.expenseCard}>
               <div style={styles.expenseHeader}>
                 <h3 style={styles.expenseName}>{expense.name}</h3>
@@ -250,7 +427,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   filtersContainer: {
     ...commonStyles.card,
-    padding: spacing.xl,
+    padding: spacing.lg,
     marginBottom: spacing.xxl,
   },
   searchBar: {
@@ -268,9 +445,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '14px',
   },
   filters: {
-    display: 'flex',
-    gap: spacing.md,
-    flexWrap: 'wrap',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gap: spacing.sm,
+    alignItems: 'start',
   },
   select: {
     ...commonStyles.select,
@@ -281,6 +459,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     ...commonStyles.buttonSecondary,
     padding: `${spacing.sm} ${spacing.lg}`,
     fontSize: '14px',
+  },
+  clearFiltersButton: {
+    gridColumn: '1 / -1',
+    padding: `${spacing.md} ${spacing.lg}`,
+    fontSize: '14px',
+    fontWeight: '600' as const,
+    border: `2px solid ${colors.border}`,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.textMuted,
+    color: colors.white,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    marginTop: spacing.sm,
   },
   emptyState: {
     ...commonStyles.card,
@@ -383,6 +574,72 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: borderRadius.md,
     cursor: 'pointer',
     fontWeight: '600' as const,
+  },
+  statsToggle: {
+    width: '100%',
+    padding: spacing.md,
+    fontSize: '16px',
+    fontWeight: '500' as const,
+    border: `1px solid ${colors.border}`,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.white,
+    color: colors.textLight,
+    cursor: 'pointer',
+    marginBottom: spacing.lg,
+    transition: 'all 0.2s',
+  },
+  statsSection: {
+    display: 'grid',
+    gap: spacing.lg,
+    marginBottom: spacing.xxl,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+  },
+  statsCard: {
+    ...commonStyles.card,
+    padding: spacing.xl,
+  },
+  statsTitle: {
+    fontSize: '18px',
+    fontWeight: '600' as const,
+    color: colors.text,
+    marginBottom: spacing.lg,
+  },
+  chartContainer: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: spacing.md,
+  },
+  chartRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  chartLabel: {
+    fontSize: '14px',
+    color: colors.text,
+    minWidth: '100px',
+    fontWeight: '500' as const,
+  },
+  chartBarContainer: {
+    flex: 1,
+    position: 'relative' as const,
+    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  chartBar: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.sm,
+    transition: 'width 0.3s ease',
+    minWidth: '2px',
+  },
+  chartValue: {
+    position: 'absolute' as const,
+    right: spacing.sm,
+    fontSize: '13px',
+    fontWeight: '600' as const,
+    color: colors.text,
   },
 };
 
