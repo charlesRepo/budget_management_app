@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
 import helmet from 'helmet';
 import session from 'express-session';
 import path from 'path';
@@ -10,9 +9,6 @@ import incomeRoutes from './routes/income';
 import settingsRoutes from './routes/settings';
 import calculationRoutes from './routes/calculations';
 import accountCreditRoutes from './routes/accountCredits';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

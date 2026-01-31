@@ -4,13 +4,13 @@
   "description": "Backend API for Budget Management App",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch --env-file=.env src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx --env-file=.env prisma/seed.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
