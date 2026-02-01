@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { calculationService } from '../services/calculations';
 import { settingsService } from '../services/settings';
+import MonthSelector from '../components/MonthSelector';
 import type { MonthlyCalculation, Settings } from '../types';
 
 const Dashboard: React.FC = () => {
@@ -96,24 +97,21 @@ const Dashboard: React.FC = () => {
       >
         <div style={styles.copyButtonContent}>
           <span style={styles.copyLabel}>{label}</span>
-          <span style={styles.copyAmount}>${roundedAmount}</span>
+          <span style={styles.copyAmount}>${roundedAmount.toFixed(2)}</span>
         </div>
-        <span style={styles.copyIcon}>{isCopied ? '✓' : '📋'}</span>
+        <span style={styles.copyIcon}>{isCopied ? '✓' : 'Copy'}</span>
       </button>
     );
   };
 
   return (
     <div style={styles.container}>
-      {/* Header */}
-      <div style={styles.header}>
-        <input
-          type="month"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          style={styles.monthInput}
-        />
-      </div>
+      {/* Month Selector */}
+      <MonthSelector
+        value={selectedMonth}
+        onChange={setSelectedMonth}
+        showLabel={false}
+      />
 
       {/* Part Selector */}
       <div style={styles.partSelector}>
@@ -455,20 +453,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '18px',
     color: '#e74c3c',
   },
-  header: {
-    marginBottom: '16px',
-  },
-  monthInput: {
-    width: '100%',
-    maxWidth: '100%',
-    padding: '12px',
-    fontSize: '16px',
-    border: '2px solid #ddd',
-    borderRadius: '8px',
-    backgroundColor: 'white',
-    fontWeight: '500',
-    boxSizing: 'border-box',
-  },
   partSelector: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
@@ -575,7 +559,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: 'bold',
   },
   copyIcon: {
-    fontSize: '24px',
+    fontSize: '12px',
+    fontWeight: 'bold',
   },
   savingsLabel: {
     fontSize: '14px',

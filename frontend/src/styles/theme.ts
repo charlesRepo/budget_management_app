@@ -66,6 +66,7 @@ export const commonStyles = {
     border: `2px solid ${colors.border}`,
     borderRadius: borderRadius.md,
     backgroundColor: colors.white,
+    color: colors.text, // Force black text color on all platforms
     boxSizing: 'border-box' as const,
     WebkitAppearance: 'none' as const,
     MozAppearance: 'none' as const,

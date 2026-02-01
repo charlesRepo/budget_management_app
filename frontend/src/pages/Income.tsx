@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { incomeService } from '../services/income';
 import { settingsService } from '../services/settings';
 import { accountCreditService } from '../services/accountCredits';
+import MonthSelector from '../components/MonthSelector';
 import type { Income, CreateIncomeInput, Settings, PaymentPeriod, AccountCredit, CreateAccountCreditInput, AccountType } from '../types';
 import { colors, spacing, borderRadius, commonStyles, pageContainer } from '../styles/theme';
 
@@ -181,24 +182,20 @@ const IncomeManagement: React.FC = () => {
     <div style={styles.container}>
       <h1 style={styles.title}>Income Management</h1>
 
-      <div style={styles.monthSelector}>
-        <label>Month: </label>
-        <input
-          type="month"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          style={styles.input}
-        />
-      </div>
+      <MonthSelector
+        value={selectedMonth}
+        onChange={setSelectedMonth}
+        showLabel={false}
+      />
 
       <div style={styles.card}>
-        <h2>Add Income</h2>
+        <h2 style={styles.sectionTitle}>Add Income</h2>
         <form onSubmit={handleSubmit} style={styles.form}>
           <select
             value={formData.personName}
             onChange={(e) => setFormData({ ...formData, personName: e.target.value })}
             required
-            style={styles.input}
+            style={commonStyles.select}
           >
             <option value="">Select Person</option>
             {settings?.person1Name && <option value={settings.person1Name}>{settings.person1Name}</option>}
@@ -208,7 +205,7 @@ const IncomeManagement: React.FC = () => {
             value={formData.paymentPeriod}
             onChange={(e) => setFormData({ ...formData, paymentPeriod: e.target.value as PaymentPeriod })}
             required
-            style={styles.input}
+            style={commonStyles.select}
           >
             <option value="part1">Part 1</option>
             <option value="part2">Part 2</option>
@@ -319,7 +316,7 @@ const IncomeManagement: React.FC = () => {
               value={creditFormData.accountType}
               onChange={(e) => setCreditFormData({ ...creditFormData, accountType: e.target.value as AccountType })}
               required
-              style={styles.input}
+              style={commonStyles.select}
             >
               <option value="checking">Checking</option>
               <option value="credit_card">Credit Card</option>
@@ -391,7 +388,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   container: { ...pageContainer },
   loading: { textAlign: 'center', padding: '40px', color: colors.textLight },
   title: { fontSize: '28px', marginBottom: spacing.xxl },
-  monthSelector: { marginBottom: spacing.xxl },
+  sectionTitle: { fontSize: '20px', fontWeight: '600', marginBottom: spacing.xl },
   card: {
     ...commonStyles.card,
     marginBottom: spacing.lg,
